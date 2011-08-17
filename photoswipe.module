@@ -1,0 +1,383 @@
+<?php
+
+/**
+ * Implementation of hook_help().
+ */
+function photoswipe_help($path, $arg) {
+  switch ($path) {
+    // Main module help for the photoswipe module
+    case 'admin/help#photoswipe':
+      return '<p>' . t('PhotoSwipe provides a nice javascript-based display for photo galleries, very sleek on mobile browsers.', array('!website' => l(t('PhotoSwipe website'), 'http://www.photoswipe.com/'))) . '</p>';
+  }
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function photoswipe_init() {
+  // Load photoswipe only on specified nodes
+  if (variable_get('photoswipe_enabled', TRUE) 
+        && photoswipe_active_url()
+        && !drupal_match_path('filter/tips', $_GET['q'])
+        && photoswipe_active_nodetype()
+        && $path = libraries_get_path('photoswipe')) {
+    drupal_add_js($path . '/lib/jquery-1.6.2.min.js', 'module');
+    drupal_add_js($path . '/lib/simple-inheritance.min.js', 'module');
+    drupal_add_js($path . '/lib/jquery.animate-enhanced.min.js', 'module');
+    drupal_add_js($path . '/code-photoswipe-jQuery-1.0.19.min.js', 'module');
+    drupal_add_css($path . '/photoswipe.css', 'module');    
+    
+    drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.js');
+
+// // Pass variables to mathjax.js
+//     $mathjax_path = variable_get('mathjax_use_cdn', TRUE) ? 'cdn' : base_path() . 'sites/all/libraries/mathjax' . '/MathJax.js';
+//     drupal_add_js(array(
+//       'mathjax' => array(
+//         'path' => $mathjax_path,
+//       ),
+//     ), 'setting');
+  }
+}
+
+/**
+ * Verify that PhotoSwipe should be active for the current URL.
+ */
+function photoswipe_active_url() {
+  $pages = variable_get('photoswipe_pages', "");
+  if (variable_get('photoswipe_active_type', 'disable') == 'disable')
+    $pages .= "admin*\nnode/add/*\nnode/*/edit"; // disable admin and edit pages
+  
+  $path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
+  // Compare the lowercase internal and lowercase path alias (if any).
+  $page_match = drupal_match_path($path, $pages);
+  if ($path != $_GET['q']) {
+    $page_match = $page_match || drupal_match_path($_GET['q'], $pages);
+  }  
+  if (variable_get('photoswipe_active_type', 'disable') == 'disable') {
+    return !$page_match;
+  }
+  else {
+    return $page_match;
+  }
+}
+
+/**
+ * Verify that PhotoSwipe should be active for the current node type.
+ */
+function photoswipe_active_nodetype() {
+  $node = menu_get_object();
+  $photoswipe_types = variable_get('photoswipe_nodetypes', array());
+  
+  if (count($photoswipe_types) > 0)
+  {
+    if (is_integer(max($photoswipe_types))) // check whether any node type has been selected
+      return TRUE; // return true if no type has been selected
+    else
+      return in_array($node->type, $photoswipe_types, $strict=TRUE); // strict is needed to compare with the values and not the keys
+  }
+  else
+    return TRUE; // return true if no type has been selected
+
+  
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function photoswipe_perm() {
+  return array('administer photoswipe');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function photoswipe_menu() {
+  $items = array();
+  $items['admin/settings/photoswipe'] = array(
+    'title' => 'PhotoSwipe',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('photoswipe_admin_settings'),
+    'access arguments' => array('administer photoswipe'),
+    'description' => 'Configure global settings for PhotoSwipe.',
+  );
+  return $items;
+}
+
+/**
+ * Configure global settings for PhotoSwipe.
+ */
+function photoswipe_admin_settings() {
+  $form['photoswipe']['photoswipe_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Global switch'),
+    '#default_value' => variable_get('photoswipe_enabled', TRUE),
+    '#description' => t('Check this box to enable PhotoSwipe on your site.'),
+  );
+  $form['photoswipe']['url'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Page specific activation settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['photoswipe']['url']['photoswipe_active_type'] = array(
+    '#type' => 'radios',
+    '#title' => t('Enable PhotoSwipe on specific pages'),
+    '#options' => array('disable' => 'Enable on every page except the listed pages.', 'enable' => 'Enable on the listed pages only.'),
+    '#default_value' => variable_get('photoswipe_active_type', 'disable'),
+  );
+  $form['photoswipe']['url']['photoswipe_pages'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Pages'),
+    '#default_value' => variable_get('photoswipe_pages', ""),
+    '#description' => t("Enter one page per line as Drupal paths. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.\nAdministration and edition pages are disabled by default (%admin, %node-add, %node-edit).", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>', '%admin' => 'admin*', '%node-add' => 'node/add/*', '%node-edit' => 'node/*/edit')),
+  );
+
+  $form['photoswipe']['nodetype'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Node types specific activation settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $options = node_get_types('names'); 
+  $form['photoswipe']['nodetype']['photoswipe_nodetypes'] = array( 
+    '#type' => 'checkboxes', 
+    '#title' => t('Enable PhotoSwipe on specific content types'), 
+    '#options' => $options, 
+    '#default_value' => variable_get('photoswipe_nodetypes', array()), 
+    '#description' => t('By default, PhotoSwipe is loaded with any node type. If any is checked, it will be loaded only on these node types.'), 
+  );
+  
+  return system_settings_form($form);
+}
+
+
+//  Imagecache / Imagefiled integration
+
+/**
+ * Implementation of hook_field_formatter_info().
+ *
+ * Add certain photoswipe+imagecache formatters to CCK image fields if the
+ * imagefield.module and the imagecache.module exist.
+ */
+function photoswipe_field_formatter_info() {
+  $formatters = array();
+
+  if (module_exists('imagecache') && module_exists('imagefield')) {
+    $presets = photoswipe_get_imagecache_presets(TRUE);
+    $types = array('filefield');
+
+    foreach ($presets as $preset) {
+      $formatters["photoswipe___original___$preset"] = array(
+        'label' => "PhotoSwipe: original to $preset",
+        'field types' => $types,
+      );
+      $formatters["photoswipe___${preset}___original"] = array(
+        'label' => "PhotoSwipe: $preset to original",
+        'field types' => $types,
+      );
+
+      foreach ($presets as $preset_alt) {
+        if ($preset != $preset_alt) {
+          $formatters["photoswipe___${preset}___$preset_alt"] = array(
+            'label' => "PhotoSwipe: $preset to $preset_alt",
+            'field types' => $types,
+          );
+        }
+      }
+    }
+  }
+
+  if (is_array($formatters)) {
+    asort($formatters);
+  }
+
+  return $formatters;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function photoswipe_theme() {
+
+  $theme = array(
+    'imagefield_image_imagecache_photoswipe' => array(
+      'arguments' => array(
+        'source' => NULL,
+        'destination' => NULL,
+        'item' => NULL,
+        'gallery_id' => array(),
+        'field_type_names' => NULL,
+      ),
+    ),
+    'photoswipe_image' => array(
+      'arguments' => array(
+        'path' => NULL,
+        'alt' => '',
+        'title' => '',
+        'attributes' => array(),
+      ),
+    ),
+  );
+
+  if (module_exists('imagecache') && module_exists('imagefield')) {
+    $presets = photoswipe_get_imagecache_presets();
+
+    $formatter = array(
+      'arguments' => array('element' => NULL),
+      'function' => 'theme_photoswipe_formatter_imagefield',
+    );
+
+    foreach ($presets as $preset) {
+      $source = $preset['presetname'];
+      $theme["photoswipe_formatter_photoswipe___original___$source"] = $formatter;
+      $theme["photoswipe_formatter_photoswipe___${source}___original"] = $formatter;
+
+      foreach ($presets as $preset) {
+        $destination = $preset['presetname'];
+
+        if ($source != $destination) {
+          $theme["photoswipe_formatter_photoswipe___${source}___$destination"] = $formatter;
+        }
+      }
+    }
+  }
+  return $theme;
+}
+
+/**
+ * Theme function for displaying the shadowbox trigger image in an imagefield.
+ */
+function theme_photoswipe_image($path, $alt = '', $title = '', $attributes = NULL) {
+  $attributes['src'] = file_create_url($path);
+  $attributes['alt'] = check_plain($alt);
+  $attributes['title'] = check_plain($title);
+  $attributes = drupal_attributes($attributes);
+
+  return "<img$attributes/>";
+}
+
+/**
+ * Implementation of theme_imagefield_image_imagecache_photoswipe().
+ */
+function theme_imagefield_image_imagecache_photoswipe($source, $destination, $item, $gallery_id = '', $field_type_names) {
+  $filepath = $item['filepath'];
+  if ($filepath == '') {
+    return;
+  }
+
+  $alt = $item['data']['alt'];
+
+  $title_text_setting = variable_get("photoswipe_title_text_$field_type_names", 0);
+  switch ($title_text_setting) {
+    case 0:
+      $title = $item['data']['title'];
+      break;
+    case 1:
+      $title = $item['data']['description'];
+      break;
+    case 2:
+      $node = node_load($item['nid']);
+      $title = $node->title;
+      break;
+  }
+
+//   $rel = ($gallery_id != '') ? "shadowbox[$gallery_id]" : 'shadowbox';
+  $link_attributes = array(
+//     'rel' => $rel,
+    'title' => $title,
+  );
+  $options = array(
+    'attributes' => $link_attributes,
+    'html' => TRUE,
+  );
+
+  if ($source == 'original') {
+    $image = theme('photoswipe_image', $filepath, $alt, $title);
+  }
+  else {
+    $image = theme('imagecache', $source, $filepath, $alt, $title);
+  }
+
+  if ($destination == 'original') {
+    $output = l($image, file_create_url($filepath), $options);
+  }
+  else {
+    $output = l($image, photoswipe_imagecache_create_url($destination, $filepath), $options);
+  }
+
+//   $wrapper_classes = ($gallery_id != '') ? "sb-image sb-gallery sb-gallery-$gallery_id" : 'sb-image sb-indivdual';
+  $wrapper_classes = "photoswipe-image photoswipe-gallery";
+  return '<div class="' . $wrapper_classes . '">' . $output . '</div>';
+}
+
+/**
+ * Implementation of theme_shadowbox_formatter_imagefield().
+ *
+ * Note: Fields with multiple values are processed during a single invocation of this function.
+ */
+function theme_photoswipe_formatter_imagefield($element) {
+  if (!module_exists('imagefield') || !module_exists('imagecache')) {
+    return;
+  }
+
+  $field_name = $element['#field_name'];
+  $field_type_names = $element['#type_name'] . '_' . $field_name;
+  $item = $element['#item'];
+  $formatter = $element['#formatter'];
+  $node = node_load($element['#node']->nid);
+
+  list($theme, $source, $destination) = explode('___', $formatter, 3);
+
+  $gallery_id = 'photoswipe-gallery';
+
+  $presets = photoswipe_get_imagecache_presets();
+  foreach ($presets as $preset) {
+    $presets[] = $preset['presetname'];
+  }
+
+  if ($source == 'original' || in_array($source, $presets)) {
+    $output = theme('imagefield_image_imagecache_photoswipe', $source, $destination, $item, $gallery_id, $field_type_names);
+  }
+
+  return $output;
+}
+
+/**
+ * Implementation of the imagecache_create_url() function for integration with
+ * imagecache module versions prior to imagecache 2.
+ */
+function photoswipe_imagecache_create_url($preset, $filepath) {
+  if (function_exists('imagecache_create_url')) {
+    return imagecache_create_url($preset, $filepath);
+  }
+  else {
+    $path = _imagecache_strip_file_directory($filepath);
+    $files_dir = file_directory_path();
+    return file_create_url("$files_dir/imagecache/$preset/$path");
+  }
+}
+
+function photoswipe_get_imagecache_presets($formatted = FALSE) {
+  $presets = array();
+  if (function_exists('imagecache_presets')) {
+    if ($formatted) {
+      foreach (imagecache_presets() as $id => $info) {
+        $presets[$id] = $info['presetname'];
+      }
+    }
+    else {
+      $presets = imagecache_presets();
+    }
+  }
+  else {
+    if ($formatted) {
+      foreach (_imagecache_get_presets() as $id => $info) {
+        $presets[$id] = $info['presetname'];
+      }
+    }
+    else {
+      $presets = _imagecache_get_presets();
+    }
+  }
+  return $presets;
+}
