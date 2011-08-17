@@ -21,10 +21,9 @@ function photoswipe_init() {
         && !drupal_match_path('filter/tips', $_GET['q'])
         && photoswipe_active_nodetype()
         && $path = libraries_get_path('photoswipe')) {
+    drupal_add_js($path . '/lib/klass.min.js', 'module');
     drupal_add_js($path . '/lib/jquery-1.6.2.min.js', 'module');
-    drupal_add_js($path . '/lib/simple-inheritance.min.js', 'module');
-    drupal_add_js($path . '/lib/jquery.animate-enhanced.min.js', 'module');
-    drupal_add_js($path . '/code-photoswipe-jQuery-1.0.19.min.js', 'module');
+    drupal_add_js($path . '/code.photoswipe.jquery-2.0.0.min.js', 'module');
     drupal_add_css($path . '/photoswipe.css', 'module');    
     
     drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.js');
@@ -168,18 +167,42 @@ function photoswipe_field_formatter_info() {
 
     foreach ($presets as $preset) {
       $formatters["photoswipe___original___$preset"] = array(
-        'label' => "PhotoSwipe: original to $preset",
+        'label' => "PhotoSwipe [all]: original to $preset",
         'field types' => $types,
       );
       $formatters["photoswipe___${preset}___original"] = array(
-        'label' => "PhotoSwipe: $preset to original",
+        'label' => "PhotoSwipe [all]: $preset to original",
+        'field types' => $types,
+      );
+      $formatters["photoswipe_field___original___$preset"] = array(
+        'label' => "PhotoSwipe [field]: original to $preset",
+        'field types' => $types,
+      );
+      $formatters["photoswipe_field___${preset}___original"] = array(
+        'label' => "PhotoSwipe [field]: $preset to original",
+        'field types' => $types,
+      );
+      $formatters["photoswipe_nid___original___$preset"] = array(
+        'label' => "PhotoSwipe [nid]: original to $preset",
+        'field types' => $types,
+      );
+      $formatters["photoswipe_nid___${preset}___original"] = array(
+        'label' => "PhotoSwipe [nid]: $preset to original",
         'field types' => $types,
       );
 
       foreach ($presets as $preset_alt) {
         if ($preset != $preset_alt) {
           $formatters["photoswipe___${preset}___$preset_alt"] = array(
-            'label' => "PhotoSwipe: $preset to $preset_alt",
+            'label' => "PhotoSwipe [all]: $preset to $preset_alt",
+            'field types' => $types,
+          );
+          $formatters["photoswipe_field___${preset}___$preset_alt"] = array(
+            'label' => "PhotoSwipe [field]: $preset to $preset_alt",
+            'field types' => $types,
+          );
+          $formatters["photoswipe_nid___${preset}___$preset_alt"] = array(
+            'label' => "PhotoSwipe [nid]: $preset to $preset_alt",
             'field types' => $types,
           );
         }
@@ -231,12 +254,18 @@ function photoswipe_theme() {
       $source = $preset['presetname'];
       $theme["photoswipe_formatter_photoswipe___original___$source"] = $formatter;
       $theme["photoswipe_formatter_photoswipe___${source}___original"] = $formatter;
+      $theme["photoswipe_formatter_photoswipe_field___original___$source"] = $formatter;
+      $theme["photoswipe_formatter_photoswipe_field___${source}___original"] = $formatter;
+      $theme["photoswipe_formatter_photoswipe_nid___original___$source"] = $formatter;
+      $theme["photoswipe_formatter_photoswipe_nid___${source}___original"] = $formatter;
 
       foreach ($presets as $preset) {
         $destination = $preset['presetname'];
 
         if ($source != $destination) {
           $theme["photoswipe_formatter_photoswipe___${source}___$destination"] = $formatter;
+          $theme["photoswipe_formatter_photoswipe_field___${source}___$destination"] = $formatter;
+          $theme["photoswipe_formatter_photoswipe_nid___${source}___$destination"] = $formatter;
         }
       }
     }
@@ -306,7 +335,7 @@ function theme_imagefield_image_imagecache_photoswipe($source, $destination, $it
   }
 
 //   $wrapper_classes = ($gallery_id != '') ? "sb-image sb-gallery sb-gallery-$gallery_id" : 'sb-image sb-indivdual';
-  $wrapper_classes = "photoswipe-image photoswipe-gallery";
+  $wrapper_classes = ($gallery_id != '') ? "photoswipe-image photoswipe-gallery photoswipe-gallery-$gallery_id" : "photoswipe-image photoswipe-gallery";
   return '<div class="' . $wrapper_classes . '">' . $output . '</div>';
 }
 
@@ -328,7 +357,17 @@ function theme_photoswipe_formatter_imagefield($element) {
 
   list($theme, $source, $destination) = explode('___', $formatter, 3);
 
-  $gallery_id = 'photoswipe-gallery';
+  switch ($theme) {
+    case 'photoswipe':
+      $gallery_id = 'simple';
+      break;
+    case 'photoswipe_field':
+      $gallery_id = $field_name;
+      break;
+    case 'photoswipe_nid':
+      $gallery_id = "nid-{$element['#node']->nid}";
+      break;
+  }
 
   $presets = photoswipe_get_imagecache_presets();
   foreach ($presets as $preset) {

@@ -9,7 +9,7 @@ module) and is still in early stage of developement.
 
 Warning: Since this module is based on a much newer version of jQuery (even than
 the one proposed by jQuery Update), it is likely to create heavy compatibility
-problem with other modules and cannot be used in admin or edit pages.
+problems with other modules and cannot be used in admin or edit pages.
 Nonetheless it can be used without Drupal or jQuery errors on standard pages!
 
 
@@ -25,8 +25,8 @@ http://drupal.org/project/libraries
 sites/all/modules/photoswipe).
 
 3. Install third party PhotoSwipe software
-     Download PhotoSwipe 1.0.19 source from PhotoSwipe website 
-     (e.g. http://github.com/downloads/codecomputerlove/PhotoSwipe/code-photoswipe.v1.0.19.zip)
+     Download PhotoSwipe 2.0.0 source from PhotoSwipe website 
+     (e.g. http://github.com/downloads/codecomputerlove/PhotoSwipe/code.photoswipe-2.0.0.zip)
      Unarchive it into your "libraries" directory (e.g. sites/all/libraries).
      You may need to create the "libraries" directory first.
      Rename it to "photoswipe" (lower case).
@@ -60,16 +60,11 @@ PhotoSwipe http://www.photoswipe.org/
 TO DO 
 =====
 
-Update to photoswipe 2.0 (when stable)
-Add support for several galleries per page (with 2.0)
-
 Drush integration
 
 Port to 7.x
 
 
 CHANGE LOG 
-========== 
+==========
 
-6.x-1.0-beta2: Support of MathJax 1.1. MathJax source is
-loaded from MathJax CDN by default. 6.x-1.0-beta1: First release.
