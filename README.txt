@@ -60,6 +60,8 @@ PhotoSwipe http://www.photoswipe.org/
 TO DO 
 =====
 
+Add javascript config string in settings. 
+
 Drush integration
 
 Port to 7.x

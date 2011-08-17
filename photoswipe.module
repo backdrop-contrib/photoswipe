@@ -21,20 +21,28 @@ function photoswipe_init() {
         && !drupal_match_path('filter/tips', $_GET['q'])
         && photoswipe_active_nodetype()
         && $path = libraries_get_path('photoswipe')) {
+
+    $useJquery = variable_get('photoswipe_use_jquery', FALSE);
     drupal_add_js($path . '/lib/klass.min.js', 'module');
-    drupal_add_js($path . '/lib/jquery-1.6.2.min.js', 'module');
-    drupal_add_js($path . '/code.photoswipe.jquery-2.0.0.min.js', 'module');
+    
+    if ($useJquery) {
+      drupal_add_js($path . '/lib/jquery-1.6.2.min.js', 'module');
+      drupal_add_js($path . '/code.photoswipe.jquery-2.0.0.min.js', 'module');
+      drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.jquery.js');
+    }
+    else {
+      drupal_add_js($path . '/code.photoswipe-2.0.0.min.js', 'module');
+      drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.js');
+    }
     drupal_add_css($path . '/photoswipe.css', 'module');    
     
-    drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.js');
 
-// // Pass variables to mathjax.js
-//     $mathjax_path = variable_get('mathjax_use_cdn', TRUE) ? 'cdn' : base_path() . 'sites/all/libraries/mathjax' . '/MathJax.js';
-//     drupal_add_js(array(
-//       'mathjax' => array(
-//         'path' => $mathjax_path,
-//       ),
-//     ), 'setting');
+// Pass variables to photoswipe.jquery.js
+    drupal_add_js(array(
+      'photoswipe' => array(
+        'useJquery' => $useJquery,
+      ),
+    ), 'setting');
   }
 }
 
@@ -111,6 +119,12 @@ function photoswipe_admin_settings() {
     '#title' => t('Global switch'),
     '#default_value' => variable_get('photoswipe_enabled', TRUE),
     '#description' => t('Check this box to enable PhotoSwipe on your site.'),
+  );
+  $form['photoswipe']['photoswipe_use_jquery'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use jQuery to load PhotoSwipe'),
+    '#default_value' => variable_get('photoswipe_use_jquery', FALSE),
+    '#description' => t('Warning: although this offers better support of desktop browser (in particular IE), it loads a much newer version of jQuery than the Drupal one which is likely to create incompatibility with other modules. Use at your own risk!'),
   );
   $form['photoswipe']['url'] = array(
     '#type' => 'fieldset',
