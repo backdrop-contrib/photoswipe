@@ -1,5 +1,13 @@
 <?php
 
+// Config variables
+global $defaultConfigString;
+$defaultConfigString = 'imageScaleMethod: "fitNoUpscale",
+allowRotationOnUserZoom: false,
+getImageCaption: function(el) {
+	return el.getAttribute("title");
+}';
+
 /**
  * Implementation of hook_help().
  */
@@ -38,11 +46,14 @@ function photoswipe_init() {
     
 
 // Pass variables to photoswipe.jquery.js
+    global $defaultConfigString;
     drupal_add_js(array(
       'photoswipe' => array(
         'useJquery' => $useJquery,
+        'configString' => variable_get('photoswipe_custom_config', $defaultConfigString),
       ),
     ), 'setting');
+    drupal_add_js('var photoswipeConfig = {' . variable_get('photoswipe_custom_config', $defaultConfigString) . '};', 'inline');
   }
 }
 
@@ -125,6 +136,13 @@ function photoswipe_admin_settings() {
     '#title' => t('Use jQuery to load PhotoSwipe'),
     '#default_value' => variable_get('photoswipe_use_jquery', FALSE),
     '#description' => t('Warning: although this offers better support of desktop browser (in particular IE), it loads a much newer version of jQuery than the Drupal one which is likely to create incompatibility with other modules. Use at your own risk!'),
+  );
+  global $defaultConfigString;
+  $form['photoswipe']['photoswipe_custom_config'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Custom configuration'),
+    '#default_value' => variable_get('photoswipe_custom_config', $defaultConfigString),
+    '#description' => t("(Advanced users only) You can customize PhotoSwipe options using a javascript object declaration."),
   );
   $form['photoswipe']['url'] = array(
     '#type' => 'fieldset',

@@ -5,12 +5,7 @@ jQuery-based lightbox library offers very nice mobile browsing features (in
 particular swiping to the next picture)!
 
 The module features imagecache and imagefield integration (from the Shadowbox
-module) and is still in early stage of developement.
-
-Warning: Since this module is based on a much newer version of jQuery (even than
-the one proposed by jQuery Update), it is likely to create heavy compatibility
-problems with other modules and cannot be used in admin or edit pages.
-Nonetheless it can be used without Drupal or jQuery errors on standard pages!
+module).
 
 
 INSTALLATION 
@@ -48,6 +43,20 @@ management >> MyContentType in the tab 'Display fields'. All possible
 combinations of imagecache presets (as thumbnails and link targets) are proposed.
 
 
+ADVANCED CONFIGURATION
+======================
+
+You can pass a javascript string to override the default option of Photoswipe
+(documented in the file README.md of PhotoSwipe).
+
+If you want better desktop browser compatibility, you can choose to load
+PhotoSwipe using jQuery.
+Warning: Since this module is based on a much newer version of jQuery (even than
+the one proposed by jQuery Update), it is likely to create heavy compatibility
+problems with other modules and cannot be used in admin or edit pages.
+Nonetheless it can be used without Drupal or jQuery errors on standard pages!
+
+
 AUTHOR 
 ======
 
@@ -60,7 +69,8 @@ PhotoSwipe http://www.photoswipe.org/
 TO DO 
 =====
 
-Add javascript config string in settings. 
+Add javascript config string in settings.
+?Does not disable admin by default if standard ps is used?
 
 Drush integration
 

@@ -6,33 +6,22 @@ Drupal.behaviors.photoswipe = function(context) {
 // var photoswipe = Drupal.settings.photoswipe;
 
   // Set options
-  var options = {
-    imageScaleMethod: "fitNoUpscale",
-    allowRotationOnUserZoom: false,
-    getImageCaption: function(el) { 
-			return el.getAttribute('title'); 
-		}
-  };
+  var options = photoswipeConfig;
 
-  // Identify all existing galleries identifiers
-  var galleries = '';
+  // Identify all existing galleries
+  var galleries = null;
   $("div[class*=photoswipe-gallery-]").each(function(index) {
     galleries += $(this).attr('class') + ' ';
   });
+
+  // Identify and instanciate all photoswipe galleries
   var regexp = /photoswipe\-gallery\-(\S*)/g; // regexp to find all the existing galleries identifiers (starting with photoswipe-gallery-)
-  galleries = ($.unique(galleries.match(regexp))).sort();
-
-// console.log(galleries);
-
-  // Instanciate all photoswipe galleries
-  if (galleries != '') {
-     galleries.forEach(function(item) {
-       // window.Code.PhotoSwipe.attach( $('.' + item + ' a'), options);
-       window.Code.PhotoSwipe.attach( window.document.querySelectorAll('.' + item + ' a'), options );
+  if (galleries != null) { // else no div found
+    galleries = ($.unique(galleries.match(regexp))).sort();
+    galleries.forEach(function(item) {
+      // window.Code.PhotoSwipe.attach( $('.' + item + ' a'), options);
+      window.Code.PhotoSwipe.attach( window.document.querySelectorAll('.' + item + ' a'), options );
     });
   }
-//   else {
-//     $(".photoswipe-image a").photoSwipe(options);
-//   }
   
 };
