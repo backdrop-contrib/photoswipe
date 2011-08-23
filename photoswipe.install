@@ -48,8 +48,9 @@ function photoswipe_requirements($phase) {
  * @return boolean True if PhotoSwipe is installed
  */
 function _photoswipe_requirements_isinstalled() {
+  global $psFile;
   $photoswipe_path = 'sites/all/libraries/photoswipe/';
-  $jspath = $photoswipe_path . '/code-photoswipe-jQuery-1.0.19.min.js';
+  $jspath = $photoswipe_path . $psFile;
   $jsp = file_exists($jspath);
   return $jsp;
 }

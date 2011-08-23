@@ -15,11 +15,8 @@ var myArr = ['Kevin', 'Kevin', 'Shamasis', 'Kevin'].getUnique(); // must be call
 /**
  * Load PhotoSwipe once page is ready
  */
-
 (function(window, PhotoSwipe){		
 	document.addEventListener('DOMContentLoaded', function(){
-    // var photoswipe = Drupal.settings.photoswipe;
-
     // Set options
     var options = photoswipeConfig;
     
@@ -42,4 +39,3 @@ var myArr = ['Kevin', 'Kevin', 'Shamasis', 'Kevin'].getUnique(); // must be call
 	}, false);
 
 }(window, window.Code.PhotoSwipe));
-

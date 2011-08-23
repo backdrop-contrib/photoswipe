@@ -3,8 +3,6 @@
  */
  
 Drupal.behaviors.photoswipe = function(context) {
-// var photoswipe = Drupal.settings.photoswipe;
-
   // Set options
   var options = photoswipeConfig;
 

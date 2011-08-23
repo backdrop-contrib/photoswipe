@@ -1,12 +1,13 @@
 <?php
 
 // Config variables
-global $defaultConfigString;
+global $defaultConfigString, $psFile;
 $defaultConfigString = 'imageScaleMethod: "fitNoUpscale",
 allowRotationOnUserZoom: false,
 getImageCaption: function(el) {
 	return el.getAttribute("title");
 }';
+$psFile = 'code.photoswipe-2.0.0.min.js'; // used in photoswipe.install as well
 
 /**
  * Implementation of hook_help().
@@ -39,7 +40,8 @@ function photoswipe_init() {
       drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.jquery.js');
     }
     else {
-      drupal_add_js($path . '/code.photoswipe-2.0.0.min.js', 'module');
+      global $psFile;
+      drupal_add_js($path . '/' . $psFile, 'module');
       drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.js');
     }
     drupal_add_css($path . '/photoswipe.css', 'module');    
