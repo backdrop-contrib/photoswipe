@@ -1,4 +1,5 @@
 name = PhotoSwipe
 description = Javascript-based photo gallery display for your Drupal website (very sleek with mobile browsers).
-core = 6.x
+core = 7.x
 dependencies[] = libraries
+configure = admin/config/media/photoswipe

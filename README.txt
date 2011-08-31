@@ -4,9 +4,6 @@ DESCRIPTION
 jQuery-based lightbox library offers very nice mobile browsing features (in
 particular swiping to the next picture)!
 
-The module features imagecache and imagefield integration (from the Shadowbox
-module).
-
 
 INSTALLATION 
 ============
@@ -37,7 +34,7 @@ USAGE
 
 In order to use this module, you must install and activate ImageCache and 
 ImageField modules.
-After adding an imagefield to any content type (e.g. 'album'), you can select
+After adding an image field to any content type (e.g. 'article'), you can select
 'PhotoSwipe: Preset1 to Preset2' as a display mode in Administer >> Content
 management >> MyContentType in the tab 'Display fields'. All possible
 combinations of imagecache presets (as thumbnails and link targets) are proposed.
@@ -61,7 +58,7 @@ AUTHOR
 ======
 
 Module written by Thomas Julou. http://drupal.org/user/273952
-ImageCache and ImageField integration taken from Shadowbox module.
+ImageCache and ImageField integration taken from Shadowbox module (D6 version).
 
 PhotoSwipe http://www.photoswipe.org/
 
@@ -69,12 +66,9 @@ PhotoSwipe http://www.photoswipe.org/
 TO DO 
 =====
 
-Add javascript config string in settings.
 ?Does not disable admin by default if standard ps is used?
 
 Drush integration
-
-Port to 7.x
 
 
 CHANGE LOG 

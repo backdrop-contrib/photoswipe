@@ -6,15 +6,19 @@
  */
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function photoswipe_uninstall() {
-  db_query("DELETE FROM {variable} WHERE name LIKE 'photoswipe_%'");
+  // TODO Please review the conversion of this statement to the D7 database API syntax.
+  /* db_query("DELETE FROM {variable} WHERE name LIKE 'photoswipe_%'") */
+  db_delete('variable')
+  ->condition('name', 'photoswipe_%', 'LIKE')
+  ->execute();
   cache_clear_all('variables', 'cache_bootstrap');
 }
 
 /**
- * Implementation of hook_requirements().
+ * Implements hook_requirements().
  *
  * This hook will issue warnings if:
  * - PhotoSwipe relies on local files and the source files are not found
@@ -22,12 +26,12 @@ function photoswipe_uninstall() {
 function photoswipe_requirements($phase) {
   $requirements = array();
   $t = get_t(); // Ensure translations don't break at install time
-  
+
   if ($phase == 'runtime') {
     $requirements['photoswipe'] = array(
       'title' => $t('PhotoSwipe'),
       'value' => $t('Installed correctly'),
-      'severity' => REQUIREMENT_OK
+      'severity' => REQUIREMENT_OK,
     );
 
     if (!_photoswipe_requirements_isinstalled()) {

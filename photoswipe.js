@@ -22,8 +22,8 @@ var myArr = ['Kevin', 'Kevin', 'Shamasis', 'Kevin'].getUnique(); // must be call
     
     // Find all existing galleries
     var galleries = null;
-    $("div[class*=photoswipe-gallery-]").each(function(index) {
-      galleries += $(this).attr('class') + ' ';
+    jQuery("div[class*=photoswipe-gallery-]").each(function(index) {
+      galleries += jQuery(this).attr('class') + ' ';
     });
     
     // Identify and instanciate all photoswipe galleries
