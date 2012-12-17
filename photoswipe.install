@@ -2,15 +2,25 @@
 
 /**
  * @file
- * PhotoSwipe Module for Drupal 6.x
+ * Install, uninstall and update hooks for Photswipe module.
  */
+
+
+/**
+ * Implements hook_enable().
+ */
+function photoswipe_enable() {
+  // Set jquery 1.7 as the jquery_update version.
+  if (variable_get('jquery_update_jquery_version', 0) < 1.7) {
+    variable_set('jquery_update_jquery_version', '1.7');
+  }
+}
 
 /**
  * Implements hook_uninstall().
  */
 function photoswipe_uninstall() {
-  // TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("DELETE FROM {variable} WHERE name LIKE 'photoswipe_%'") */
+  // Remove photoswipe variables.
   db_delete('variable')
   ->condition('name', 'photoswipe_%', 'LIKE')
   ->execute();
@@ -19,22 +29,23 @@ function photoswipe_uninstall() {
 
 /**
  * Implements hook_requirements().
- *
- * This hook will issue warnings if:
- * - PhotoSwipe relies on local files and the source files are not found
  */
 function photoswipe_requirements($phase) {
   $requirements = array();
-  $t = get_t(); // Ensure translations don't break at install time
+  // Ensure translations don't break at install time.
+  $t = get_t();
+
 
   if ($phase == 'runtime') {
+    $path = libraries_get_path('photoswipe');
+    $version = photoswipe_get_version($path);
     $requirements['photoswipe'] = array(
       'title' => $t('PhotoSwipe'),
-      'value' => $t('Installed correctly'),
+      'value' => $version,
       'severity' => REQUIREMENT_OK,
     );
 
-    if (!_photoswipe_requirements_isinstalled()) {
+    if (!$path || !file_exists($path . '/code.photoswipe.jquery-' . $version . '.min.js')) {
       $requirements['photoswipe']['value'] = $t('Third party PhotoSwipe software not properly installed');
       $requirements['photoswipe']['description'] = $t('PhotoSwipe was not found in the \'libraries\' folder (e.g. sites/all/libraries).');
       $requirements['photoswipe']['severity'] = REQUIREMENT_ERROR;
@@ -42,19 +53,4 @@ function photoswipe_requirements($phase) {
   }
 
   return $requirements;
-}
-
-/**
- * Determines whether the PhotoSwipe sources are present
- * It checks if code-photoswipe-jQuery-1.0.19.min.js is present.
- * This function is used by photoswipe_requirements()
- *
- * @return boolean True if PhotoSwipe is installed
- */
-function _photoswipe_requirements_isinstalled() {
-  global $psFile;
-  $photoswipe_path = 'sites/all/libraries/photoswipe/';
-  $jspath = $photoswipe_path . $psFile;
-  $jsp = file_exists($jspath);
-  return $jsp;
 }

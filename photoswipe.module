@@ -1,13 +1,35 @@
 <?php
 
-// Config variables
-global $defaultConfigString, $psFile;
-$defaultConfigString = 'imageScaleMethod: "fitNoUpscale",
-allowRotationOnUserZoom: false,
-getImageCaption: function(el) {
-	return el.getAttribute("title");
-}';
-$psFile = 'code.photoswipe-2.0.0.min.js'; // used in photoswipe.install as well
+/**
+ * @file
+ * Photswipe integration with Drupal module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function photoswipe_theme() {
+  return array(
+    'photoswipe_imagefield' => array(
+      'variables' => array(
+        'image' => array(),
+        'path' => NULL,
+        'title' => NULL,
+        'gid' => NULL,
+      ),
+      'file' => 'photoswipe.theme.inc',
+    ),
+    'photoswipe_image_formatter' => array(
+      'variables' => array(
+        'item' => NULL,
+        'node' => NULL,
+        'field' => array(),
+        'display_settings' => array(),
+      ),
+      'file' => 'photoswipe.theme.inc',
+    ),
+  );
+}
 
 /**
  * Implements hook_help().
@@ -24,96 +46,21 @@ function photoswipe_help($path, $arg) {
  * Implements hook_init().
  */
 function photoswipe_init() {
-  // Load photoswipe only on specified nodes
-  if (variable_get('photoswipe_enabled', TRUE)
-         && photoswipe_active_url()
-         && !drupal_match_path('filter/tips', $_GET['q'])
-         && photoswipe_active_nodetype()
-         && $path = libraries_get_path('photoswipe')) {
+  $path = libraries_get_path('photoswipe');
+  $version = photoswipe_get_version($path);
 
-    $useJquery = variable_get('photoswipe_use_jquery', FALSE);
-    drupal_add_js($path . '/lib/klass.min.js');
+  drupal_add_js($path . '/lib/klass.min.js');
 
-    if ($useJquery) {
-      drupal_add_js($path . '/lib/jquery-1.6.2.min.js');
-      drupal_add_js($path . '/code.photoswipe.jquery-2.0.0.min.js');
-      drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.jquery.js');
-    }
-    else {
-      global $psFile;
-      drupal_add_js($path . '/' . $psFile);
-      drupal_add_js(drupal_get_path('module', 'photoswipe') . '/photoswipe.js');
-    }
-    drupal_add_css($path . '/photoswipe.css');
+  drupal_add_js($path . '/code.photoswipe.jquery-' . $version . '.js');
+  drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js');
 
-
-    // Pass variables to photoswipe.jquery.js
-    global $defaultConfigString;
-    drupal_add_js(array(
-      'photoswipe' => array(
-        'useJquery' => $useJquery,
-        'configString' => variable_get('photoswipe_custom_config', $defaultConfigString),
-      ),
-    ), array('type' => 'setting', 'scope' => JS_DEFAULT));
-    drupal_add_js('var photoswipeConfig = {' . variable_get('photoswipe_custom_config', $defaultConfigString) . '};', array('type' => 'inline', 'scope' => JS_DEFAULT));
-  }
-}
-
-/**
- * Verify that PhotoSwipe should be active for the current URL.
- */
-function photoswipe_active_url() {
-  $pages = variable_get('photoswipe_pages', "");
-  if (variable_get('photoswipe_active_type', 'disable') == 'disable') {
-    $pages .= "admin*\nnode/add/*\nnode/*/edit"; // disable admin and edit pages
-  }
-
-  $path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
-  // Compare the lowercase internal and lowercase path alias (if any).
-  $page_match = drupal_match_path($path, $pages);
-  if ($path != $_GET['q']) {
-    $page_match = $page_match || drupal_match_path($_GET['q'], $pages);
-  }
-  if (variable_get('photoswipe_active_type', 'disable') == 'disable') {
-    return !$page_match;
-  }
-  else {
-    return $page_match;
-  }
-}
-
-/**
- * Verify that PhotoSwipe should be active for the current node type.
- */
-function photoswipe_active_nodetype() {
-  $node = menu_get_object();
-  $photoswipe_types = variable_get('photoswipe_nodetypes', array());
-
-  if (count($photoswipe_types) > 0) {
-    if (is_integer(max($photoswipe_types))) { // check whether any node type has been selected
-      return TRUE; // return true if no type has been selected
-    }
-    else {
-      return in_array($node->type, $photoswipe_types, $strict = TRUE); // strict is needed to compare with the values and not the keys
-    }
-  }
-  else {
-    return TRUE; // return true if no type has been selected
-  }
-
-
-}
-
-/**
- * Implements hook_permission().
- */
-function photoswipe_permission() {
-  return array(
-    'administer photoswipe' => array(
-      'title' => t('administer photoswipe'),
-      'description' => t('TODO Add a description for \'administer photoswipe\''),
+  drupal_add_css($path . '/photoswipe.css');
+  $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
+  drupal_add_js(array(
+    'photoswipe' => array(
+      'options' => $settings,
     ),
-  );
+  ), array('type' => 'setting', 'scope' => JS_DEFAULT));
 }
 
 /**
@@ -125,9 +72,8 @@ function photoswipe_menu() {
     'title' => 'PhotoSwipe',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('photoswipe_admin_settings'),
-    'access arguments' => array('administer photoswipe'),
-    'description' => 'Configure global settings for PhotoSwipe.',
-    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Configure settings for PhotoSwipe javascript library.',
   );
   return $items;
 }
@@ -136,62 +82,174 @@ function photoswipe_menu() {
  * Configure global settings for PhotoSwipe.
  */
 function photoswipe_admin_settings($form, &$form_state) {
-  $form['photoswipe']['photoswipe_enabled'] = array(
+  $form['photoswipe']['photoswipe_jquery_mobile'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Global switch'),
-    '#default_value' => variable_get('photoswipe_enabled', TRUE),
-    '#description' => t('Check this box to enable PhotoSwipe on your site.'),
+    '#title' => t('Force jQuery Mobile integration'),
+    '#default_value' => variable_get('photoswipe_jquery_mobile', FALSE),
+    '#description' => t('By default, PhotoSwipe will try and work this out for you. Enable this if PhotoSwipe fails to do so.'),
   );
-  $form['photoswipe']['photoswipe_use_jquery'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use jQuery to load PhotoSwipe'),
-    '#default_value' => variable_get('photoswipe_use_jquery', FALSE),
-    '#description' => t('Warning: although this offers better support of desktop browser (in particular IE), it loads a much newer version of jQuery than the Drupal one which is likely to create incompatibility with other modules. Use at your own risk!'),
-  );
-  global $defaultConfigString;
-  $form['photoswipe']['photoswipe_custom_config'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Custom configuration'),
-    '#default_value' => variable_get('photoswipe_custom_config', $defaultConfigString),
-    '#description' => t("(Advanced users only) You can customize PhotoSwipe options using a javascript object declaration."),
-  );
-  $form['photoswipe']['url'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Page specific activation settings'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-  );
-  $form['photoswipe']['url']['photoswipe_active_type'] = array(
-    '#type' => 'radios',
-    '#title' => t('Enable PhotoSwipe on specific pages'),
-    '#options' => array(
-      'disable' => 'Enable on every page except the listed pages.',
-      'enable' => 'Enable on the listed pages only.',
-    ),
-    '#default_value' => variable_get('photoswipe_active_type', 'disable'),
-  );
-  $form['photoswipe']['url']['photoswipe_pages'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Pages'),
-    '#default_value' => variable_get('photoswipe_pages', ""),
-    '#description' => t("Enter one page per line as Drupal paths. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.\nAdministration and edition pages are disabled by default (%admin, %node-add, %node-edit).", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>', '%admin' => 'admin*', '%node-add' => 'node/add/*', '%node-edit' => 'node/*/edit')),
-  );
-
-  $form['photoswipe']['nodetype'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Node types specific activation settings'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $options = node_type_get_names();
-  $form['photoswipe']['nodetype']['photoswipe_nodetypes'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Enable PhotoSwipe on specific content types'),
-    '#options' => $options,
-    '#default_value' => variable_get('photoswipe_nodetypes', array()),
-    '#description' => t('By default, PhotoSwipe is loaded with any node type. If any is checked, it will be loaded only on these node types.'),
-  );
-
   return system_settings_form($form);
 }
 
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function photoswipe_field_formatter_info() {
+  return array(
+    'photoswipe' => array(
+      'label' => t('Photoswipe'),
+      'field types' => array('image'),
+      'settings' => array(
+        'photoswipe_node_style' => '',
+        'photoswipe_image_style' => '',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function photoswipe_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $image_styles = image_style_options(FALSE);
+  $image_styles_hide = $image_styles;
+  $image_styles_hide['hide'] = t('Hide (do not display image)');
+  $element['photoswipe_node_style'] = array(
+    '#title' => t('Node image style'),
+    '#type' => 'select',
+    '#default_value' => $settings['photoswipe_node_style'],
+    '#empty_option' => t('None (original image)'),
+    '#options' => $image_styles_hide,
+    '#description' => t('Image style to use in the node.'),
+  );
+  $element['photoswipe_image_style'] = array(
+    '#title' => t('Photoswipe image style'),
+    '#type' => 'select',
+    '#default_value' => $settings['photoswipe_image_style'],
+    '#empty_option' => t('None (original image)'),
+    '#options' => $image_styles,
+    '#description' => t('Image style to use in the Photoswipe.'),
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function photoswipe_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  $image_styles = image_style_options(FALSE);
+  // Unset possible 'No defined styles' option.
+  unset($image_styles['']);
+  // Styles could be lost because of enabled/disabled modules that defines
+  // their styles in code.
+  if (isset($image_styles[$settings['photoswipe_node_style']])) {
+    $summary[] = t('Node image style: @style', array('@style' => $image_styles[$settings['photoswipe_node_style']]));
+  }
+  else if ($settings['photoswipe_node_style'] == 'hide') {
+    $summary[] = t('Node image style: Hide');
+  }
+  else {
+    $summary[] = t('Node image style: Original image');
+  }
+
+  if (isset($image_styles[$settings['photoswipe_image_style']])) {
+    $summary[] = t('Photoswipe image style: @style', array('@style' => $image_styles[$settings['photoswipe_image_style']]));
+  }
+  else {
+    $summary[] = t('photoswipe image style: Original image');
+  }
+
+  return implode('<br />', $summary);
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function photoswipe_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array(
+    '#type' => 'container',
+    '#attributes' => array('class' => array('photoswipe-gallery')),
+  );
+
+  foreach ($items as $delta => $item) {
+    $element[$delta] = array(
+      '#theme' => 'photoswipe_image_formatter',
+      '#item' => $item,
+      '#node' => $entity,
+      '#field' => $field,
+      '#display_settings' => $display['settings'],
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Get photoswipe version.
+ */
+function photoswipe_get_version($path = NULL) {
+  $version = drupal_static(__FUNCTION__);
+  if (!empty($version)) {
+    return $version;
+  }
+  if (!$path) {
+    $path = libraries_get_path('photoswipe');
+  }
+  foreach (glob($path . "/code.photoswipe.jquery-*.min.js") as $filename) {
+    $version = str_replace(array($path, '/code.photoswipe.jquery-', '.min.js'), '', $filename);
+  }
+  return $version;
+}
+
+/**
+ * Get photoswipe default settings.
+ */
+function photoswipe_get_default_settings() {
+  return array(
+    'allowUserZoom' => FALSE,
+    'autoStartSlideshow' => FALSE,
+    'allowRotationOnUserZoom' => FALSE,
+    'backButtonHideEnabled' => TRUE,
+    'captionAndToolbarAutoHideDelay' => 5000,
+    'captionAndToolbarFlipPosition' => FALSE,
+    'captionAndToolbarHide' => FALSE,
+    'captionAndToolbarOpacity' => 0.8,
+    'captionAndToolbarShowEmptyCaptions' => TRUE,
+    'cacheMode' => 'normal',
+    'doubleTapSpeed' => 300,
+    'doubleTapZoomLevel' => '2.5',
+    'enableDrag' => TRUE ,
+    'enableKeyboard' => TRUE,
+    'enableMouseWheel' => TRUE ,
+    'fadeInSpeed' => 250,
+    'fadeOutSpeed' => 250,
+    'imageScaleMethod' => 'fit',
+    'invertMouseWheel' => FALSE,
+    'jQueryMobile' => variable_get('photoswipe_jquery_mobile'),
+    'jQueryMobileDialogHash' => '&ui-state=dialog',
+    'loop' => TRUE,
+    'margin' => 20,
+    'maxUserZoom' => '5.0',
+    'minUserZoom' => '0.5',
+    'mouseWheelSpeed' => 500,
+    'nextPreviousSlideSpeed' => 0,
+    'preventHide' => FALSE,
+    'preventSlideshow' => FALSE,
+    'slideshowDelay' => 3000,
+    'slideSpeed' => 250,
+    'swipeThreshold' => 50,
+    'swipeTimeThreshold' => 250,
+    'slideTimingFunction' => 'ease-out',
+    'zIndex' => 1000,
+  );
+}
