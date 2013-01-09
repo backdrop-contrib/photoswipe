@@ -22,6 +22,12 @@ function theme_photoswipe_image_formatter($variables) {
   $field = $variables['field'];
   $settings = $variables['display_settings'];
 
+  if (empty($item['alt']) && !empty($item['field_file_image_alt_text'][LANGUAGE_NONE])) {
+    $item['alt'] = $item['field_file_image_alt_text'][LANGUAGE_NONE][0]['value'];
+  }
+  if (empty($item['title']) && !empty($item['field_file_image_title_text'][LANGUAGE_NONE])) {
+    $item['title'] = $item['field_file_image_title_text'][LANGUAGE_NONE][0]['value'];
+  }
   $image = array(
     'path' => $item['uri'],
     'alt' => $item['alt'],
