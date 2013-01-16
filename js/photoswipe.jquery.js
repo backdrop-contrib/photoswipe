@@ -7,7 +7,7 @@ Drupal.behaviors.photoswipe = {
     var $galleries = $('.photoswipe-gallery', context);
     if ($galleries.length) {
       $galleries.each(function () {
-        $(this).find('a.photoswipe').photoSwipe({});
+        $(this).find('a.photoswipe').photoSwipe(settings.photoswipe.options);
       });
     }
   }
