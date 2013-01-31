@@ -10,6 +10,12 @@ Drupal.behaviors.photoswipe = {
         $(this).find('a.photoswipe').photoSwipe(settings.photoswipe.options);
       });
     }
+    else if ($('a.photoswipe', context).length) {
+      // We have no galleries just individual images.
+      $('a.photoswipe', context).each(function() {
+        $(this).photoSwipe(settings.photoswipe.options);
+      });
+    }
   }
 };
 })(jQuery);

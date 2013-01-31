@@ -21,17 +21,19 @@ function theme_photoswipe_image_formatter($variables) {
   $node = $variables['node'];
   $field = $variables['field'];
   $settings = $variables['display_settings'];
+  $alt = !empty($item['alt']) ? $item['alt'] : '';
+  $title = !empty($item['title']) ? $item['title'] : '';
 
-  if (empty($item['alt']) && !empty($item['field_file_image_alt_text'][LANGUAGE_NONE])) {
-    $item['alt'] = $item['field_file_image_alt_text'][LANGUAGE_NONE][0]['value'];
+  if (empty($alt) && !empty($item['field_file_image_alt_text'][LANGUAGE_NONE])) {
+    $alt = $item['field_file_image_alt_text'][LANGUAGE_NONE][0]['value'];
   }
-  if (empty($item['title']) && !empty($item['field_file_image_title_text'][LANGUAGE_NONE])) {
-    $item['title'] = $item['field_file_image_title_text'][LANGUAGE_NONE][0]['value'];
+  if (empty($title) && !empty($item['field_file_image_title_text'][LANGUAGE_NONE])) {
+    $title = $item['field_file_image_title_text'][LANGUAGE_NONE][0]['value'];
   }
   $image = array(
     'path' => $item['uri'],
-    'alt' => $item['alt'],
-    'title' => $item['title'],
+    'alt' => $alt,
+    'title' => $title,
     'style_name' => $settings['photoswipe_node_style'],
   );
 
