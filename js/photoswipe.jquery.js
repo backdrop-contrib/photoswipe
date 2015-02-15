@@ -23,9 +23,10 @@
           $gallery.on('click', Drupal.behaviors.photoswipe.onThumbnailsClick);
         });
       }
-      else if ($('a.photoswipe', context).length) {
+      var $imagesWithoutGalleries = $(':not(.photoswipe-gallery) a.photoswipe', context);
+      if ($imagesWithoutGalleries.length) {
         // We have no galleries just individual images.
-        $('a.photoswipe', context).each(function(index) {
+        $imagesWithoutGalleries.each(function(index) {
           $imageLink = $(this);
           $imageLink.wrap('<span class="photoswipe-gallery"></span>');
           var $gallery = $imageLink.parent();
@@ -53,7 +54,7 @@
 
       var $clickedGallery = $(this);
 
-      var eTarget = e.target || e.srcElement;console.log(eTarget);
+      var eTarget = e.target || e.srcElement;
       var $eTarget = $(eTarget);
 
       // find root element of slide
