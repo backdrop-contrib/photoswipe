@@ -111,7 +111,7 @@ function photoswipe_libraries_info() {
 /**
  * Implements hook_page_build().
  */
-function photoswipe_page_build(&$page) {photoswipe_load_assets();
+function photoswipe_page_build(&$page) {
   if (photoswipe_assets_loaded()) {
     $page['page_bottom']['photoswipe'] = array(
       '#theme' => 'photoswipe_container',
