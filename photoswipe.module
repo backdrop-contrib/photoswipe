@@ -112,22 +112,11 @@ function photoswipe_libraries_info() {
  * Implements hook_page_build().
  */
 function photoswipe_page_build(&$page) {
-  libraries_load('photoswipe');
-
-  drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js');
-
-  $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
-  drupal_add_js(array(
-    'photoswipe' => array(
-      'options' => $settings,
-    ),
-  ), array('type' => 'setting', 'scope' => JS_DEFAULT));
-
-  // Add our CSS file that adds common needed classes, such as align-left,
-  // align-right, underline, indent, etc.
-  $page['page_bottom']['photoswipe'] = array(
-    '#theme' => 'photoswipe_container',
-  );
+  if (photoswipe_assets_loaded()) {
+    $page['page_bottom']['photoswipe'] = array(
+      '#theme' => 'photoswipe_container',
+    );
+  }
 }
 
 /**
@@ -217,6 +206,7 @@ function photoswipe_field_formatter_view($entity_type, $entity, $field, $instanc
   $element = array();
 
   if (!empty($items)) {
+    photoswipe_load_assets();
     $element = array(
       '#type' => 'container',
       '#attributes' => array('class' => array('photoswipe-gallery')),
@@ -234,6 +224,45 @@ function photoswipe_field_formatter_view($entity_type, $entity, $field, $instanc
   }
 
   return $element;
+}
+
+/**
+ * Loads photoswipe assets.
+ */
+function photoswipe_load_assets() {
+  static $loaded;
+
+  if (!$loaded) {
+    libraries_load('photoswipe');
+
+    drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js');
+
+    $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
+    drupal_add_js(array(
+      'photoswipe' => array(
+        'options' => $settings,
+      ),
+    ), array('type' => 'setting', 'scope' => JS_DEFAULT));
+    photoswipe_assets_loaded(TRUE);
+  }
+}
+
+/**
+ * Stores whether photoswipe assets has been loaded in the same request.
+ *
+ * @param bool $loaded
+ *   (Optional) Set whether assets are loaded or not.
+ *
+ * @return bool
+ */
+function photoswipe_assets_loaded($loaded = NULL) {
+  static $status;
+
+  if ($loaded) {
+    $status = $loaded;
+  }
+
+  return $status;
 }
 
 /**

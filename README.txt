@@ -35,9 +35,3 @@ After adding an image field to any content type (e.g. 'article'), you can select
 'PhotoSwipe: Preset1 to Preset2' as a display mode in Structure >> Content types
 >> MyContentType in the tab 'Manage display'. All possible
 combinations of image styles are proposed.
-
-
-TO DO
-=====
-
-Drush integration
