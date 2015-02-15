@@ -23,7 +23,9 @@
           $gallery.on('click', Drupal.behaviors.photoswipe.onThumbnailsClick);
         });
       }
-      var $imagesWithoutGalleries = $(':not(.photoswipe-gallery) a.photoswipe', context);
+      var $imagesWithoutGalleries = $('a.photoswipe', context).filter(function(elem) {
+        return !$(this).parents('.photoswipe-gallery').length;
+      });
       if ($imagesWithoutGalleries.length) {
         // We have no galleries just individual images.
         $imagesWithoutGalleries.each(function(index) {
@@ -84,7 +86,7 @@
       var images = galleryElement.find('a.photoswipe');
       images.each(function (index) {
         var $image = $(this);
-        size = $image.data('size').split('x');
+        size = $image.data('size') ? $image.data('size').split('x') : ['',''];
         items.push(
           {
             src : $image.attr('href'),
