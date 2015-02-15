@@ -31,7 +31,29 @@ it in a site specific (e.g. sites/mysite/libraries) or default folder
 USAGE
 =====
 
+1. Multiple images in nodes
 After adding an image field to any content type (e.g. 'article'), you can select
 'PhotoSwipe: Preset1 to Preset2' as a display mode in Structure >> Content types
 >> MyContentType in the tab 'Manage display'. All possible
 combinations of image styles are proposed.
+
+2. Multiple images in Views
+To use photoswipe in views you must add a custom CSS class called
+'photoswipe-gallery'.
+Fields >> Content: Image >> Style settings >> check Customize field and label
+wrapper HTML >> Wrapper HTML element (leave default) >> check Create a CSS class
+>> add as CSS class 'photoswipe-gallery'.
+It is NOT recommended to add the CSS class to Advanced >> Other >> CSS class in
+a View since there are known issues with the ajax pager.
+
+3. Single image in node
+To load a single image in node you must add data-size="widthxheight"
+(the exact size of the image) and the class="photoswipe" to display it properly.
+e.g.
+<a href="/images/test_img.png" class="photoswipe" data-size="640x400">
+ <img src="/images/test_img.png" alt="Test Image" />
+</a>
+It might be needed to load photoswipe assets in case they are not already loaded
+To do so just call
+photoswipe_load_assets();
+in a THEME_preprocess_html() implementation of your theme.
