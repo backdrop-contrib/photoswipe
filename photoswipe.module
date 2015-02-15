@@ -73,9 +73,10 @@ function photoswipe_libraries_info() {
   $libraries['photoswipe'] = array(
     'name' => 'Photoswipe plugin',
     'vendor url' => 'http://photoswipe.com',
-    'download url' => 'https://github.com/dimsemenov/PhotoSwipe/archive/v4.0.1.zip',
+    'download url' => 'https://github.com/dimsemenov/PhotoSwipe/archive/v4.0.5.zip',
+    'path' => 'dist',
     'version arguments' => array(
-      'file' => 'photoswipe.min.js',
+      'file' => 'dist/photoswipe.min.js',
       'pattern' => '@(?i:PhotoSwipe)\s-\sv?([0-9\.a-z]+)@',
       'lines' => 5,
     ),
