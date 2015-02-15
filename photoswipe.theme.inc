@@ -37,19 +37,25 @@ function theme_photoswipe_image_formatter($variables) {
     'style_name' => $settings['photoswipe_node_style'],
   );
 
+  $dimensions = array();
   if (isset($item['width']) && isset($item['height'])) {
-    $image['width'] = $item['width'];
-    $image['height'] = $item['height'];
+    $image['width'] = $dimensions['width'] = $item['width'];
+    $image['height'] = $dimensions['height'] = $item['height'];
   }
 
   if ($style_name = $settings['photoswipe_image_style']) {
     $path = image_style_url($style_name, $image['path']);
+    $dimensions = array(
+      'width' => $item['width'],
+      'height' => $item['height'],
+    );
+    image_style_transform_dimensions($style_name, $dimensions);
   }
   else {
     $path = file_create_url($image['path']);
   }
 
-  return theme('photoswipe_imagefield', array('image' => $image, 'path' => $path));
+  return theme('photoswipe_imagefield', array('image' => $image, 'path' => $path, 'dimensions' => $dimensions['width'] . 'x' . $dimensions['height']));
 }
 
 
@@ -65,7 +71,6 @@ function theme_photoswipe_image_formatter($variables) {
  */
 function theme_photoswipe_imagefield($variables) {
   $class = array('photoswipe');
-
   if (!empty($variables['image']['style_name'])) {
     $image = theme('image_style', $variables['image']);
   }
@@ -77,6 +82,8 @@ function theme_photoswipe_imagefield($variables) {
     'html' => TRUE,
     'attributes' => array(
       'class' => implode(' ', $class),
+      'data-size' => $variables['dimensions'],
+      'data-overlay-title' => $variables['image']['alt']
     )
   );
 

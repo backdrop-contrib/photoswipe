@@ -6,6 +6,12 @@
  */
 
 /**
+ * The default path to the Colorbox directory.
+ */
+define('PHOTOSWIPE_MIN_PLUGIN_VERSION', '4.0.0');
+
+
+/**
  * Implements hook_theme().
  */
 function photoswipe_theme() {
@@ -14,6 +20,7 @@ function photoswipe_theme() {
       'variables' => array(
         'image' => array(),
         'path' => NULL,
+        'dimension' => NULL,
         'title' => NULL,
         'gid' => NULL,
       ),
@@ -46,22 +53,118 @@ function photoswipe_help($path, $arg) {
  * Implements hook_init().
  */
 function photoswipe_init() {
-  $path = libraries_get_path('photoswipe');
-  $version = photoswipe_get_version($path);
+  libraries_load('photoswipe');
 
-  drupal_add_js($path . '/lib/klass.min.js');
-
-  drupal_add_js($path . '/code.photoswipe.jquery-' . $version . '.js');
   drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js');
 
-  drupal_add_css($path . '/photoswipe.css');
-  $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
-  drupal_add_js(array(
-    'photoswipe' => array(
-      'options' => $settings,
-    ),
-  ), array('type' => 'setting', 'scope' => JS_DEFAULT));
+  // $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
+  // drupal_add_js(array(
+  //   'photoswipe' => array(
+  //     'options' => $settings,
+  //   ),
+  // ), array('type' => 'setting', 'scope' => JS_DEFAULT));
 }
+
+
+/**
+ * Implements hook_libraries_info().
+ */
+function photoswipe_libraries_info() {
+  $libraries['photoswipe'] = array(
+    'name' => 'Photoswipe plugin',
+    'vendor url' => 'http://photoswipe.com',
+    'download url' => 'https://github.com/dimsemenov/PhotoSwipe/archive/v4.0.1.zip',
+    'version arguments' => array(
+      'file' => 'photoswipe.min.js',
+      'pattern' => '@(?i:PhotoSwipe)\s-\sv?([0-9\.a-z]+)@',
+      'lines' => 5,
+    ),
+    'files' => array(
+      'js' => array(
+        'photoswipe.min.js',
+        'photoswipe-ui-default.min.js'
+      ),
+      'css' => array(
+        'photoswipe.css',
+        'default-skin/default-skin.css'
+      )
+    ),
+    'variants' => array(
+      'minified' => array(
+        'files' => array(
+          'js' => array(
+            'photoswipe.min.js',
+            'photoswipe-ui-default.min.js'
+          ),
+          'css' => array(
+            'photoswipe.css'
+          )
+        ),
+      ),
+      'source' => array(
+        'files' => array(
+          'js' => array(
+            'photoswipe.js',
+            'photoswipe-ui-default.js'
+          ),
+          'css' => array(
+            'photoswipe.css',
+            'default-skin/default-skin.css'
+          )
+        ),
+      ),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Implements hook_page_build().
+ */
+function photoswipe_page_build(&$page) {
+  // Add our CSS file that adds common needed classes, such as align-left,
+  // align-right, underline, indent, etc.
+  $page['page_bottom']['photoswipe']['#markup'] = '
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="pswp__bg"></div>
+        <div class="pswp__scroll-wrap">
+            <div class="pswp__container">
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+            </div>
+            <div class="pswp__ui pswp__ui--hidden">
+                <div class="pswp__top-bar">
+                    <div class="pswp__counter"></div>
+                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                    <button class="pswp__button pswp__button--share" title="Share"></button>
+                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                    <div class="pswp__preloader">
+                        <div class="pswp__preloader__icn">
+                          <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                    <div class="pswp__share-tooltip"></div>
+                </div>
+                <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+                </button>
+                <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+                </button>
+                <div class="pswp__caption">
+                    <div class="pswp__caption__center"></div>
+                </div>
+              </div>
+            </div>
+    </div>
+  ';
+}
+
 
 /**
  * Implements hook_menu().
