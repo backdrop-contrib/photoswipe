@@ -272,8 +272,8 @@ function photoswipe_assets_loaded($loaded = NULL) {
  */
 function photoswipe_get_default_settings() {
   return array(
-    'index' => 0,
-    'getThumbBoundsFn' => NULL,
+    //'index' => 0,
+    //'getThumbBoundsFn' => NULL,
     'showAnimationDuration' => 333,
     'hideAnimationDuration' => 333,
     'showHideOpacity' => FALSE,
@@ -281,7 +281,7 @@ function photoswipe_get_default_settings() {
     'spacing' => 0.12,
     'allowPanToNext' => TRUE,
     'maxSpreadZoom' => 2,
-    'getDoubleTapZoom' => NULL,
+    //'getDoubleTapZoom' => NULL,
     'loop' => TRUE,
     'pinchToClose' => TRUE,
     'closeOnScroll' => TRUE,
@@ -290,12 +290,12 @@ function photoswipe_get_default_settings() {
     'escKey' => TRUE,
     'arrowKeys' => TRUE,
     'history' => TRUE,
-    'galleryUID' => 1,
+    //'galleryUID' => 1,
     'errorMsg' => '<div class="pswp__error-msg">' . t('<a href="%url%" target="_blank">The image</a> could not be loaded.') . '</div>',
     'preload' => array(1, 1),
     'mainClass' => NULL,
-    'getNumItemsFn' => NULL,
+    //'getNumItemsFn' => NULL,
     'focus' => TRUE,
-    'isClickableElement' => NULL,
+    //'isClickableElement' => NULL,
   );
 }

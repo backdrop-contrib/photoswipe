@@ -49,10 +49,10 @@
                 <div class="pswp__share-tooltip"></div>
             </div>
 
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            <button class="pswp__button pswp__button--arrow--left" title="<?php print t('Previous (arrow left)'); ?>">
             </button>
 
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            <button class="pswp__button pswp__button--arrow--right" title="<?php print t('Next (arrow right)'); ?>">
             </button>
 
             <div class="pswp__caption">
