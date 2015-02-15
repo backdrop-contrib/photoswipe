@@ -6,7 +6,7 @@
  */
 
 /**
- * The default path to the Colorbox directory.
+ * The minimum PhotoSwipe version we support.
  */
 define('PHOTOSWIPE_MIN_PLUGIN_VERSION', '4.0.0');
 
@@ -35,6 +35,11 @@ function photoswipe_theme() {
       ),
       'file' => 'photoswipe.theme.inc',
     ),
+    'photoswipe_container' => array(
+      'variables' => array(),
+      'file' => 'photoswipe.theme.inc',
+      'template' => 'photoswipe-container',
+    ),
   );
 }
 
@@ -48,23 +53,6 @@ function photoswipe_help($path, $arg) {
       return '<p>' . t('PhotoSwipe provides a nice javascript-based display for photo galleries, very sleek on mobile browsers.', array('!website' => l(t('PhotoSwipe website'), 'http://www.photoswipe.com/'))) . '</p>';
   }
 }
-
-/**
- * Implements hook_init().
- */
-function photoswipe_init() {
-  libraries_load('photoswipe');
-
-  drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js');
-
-  // $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
-  // drupal_add_js(array(
-  //   'photoswipe' => array(
-  //     'options' => $settings,
-  //   ),
-  // ), array('type' => 'setting', 'scope' => JS_DEFAULT));
-}
-
 
 /**
  * Implements hook_libraries_info().
@@ -124,77 +112,23 @@ function photoswipe_libraries_info() {
  * Implements hook_page_build().
  */
 function photoswipe_page_build(&$page) {
+  libraries_load('photoswipe');
+
+  drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js');
+
+  $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
+  drupal_add_js(array(
+    'photoswipe' => array(
+      'options' => $settings,
+    ),
+  ), array('type' => 'setting', 'scope' => JS_DEFAULT));
+
   // Add our CSS file that adds common needed classes, such as align-left,
   // align-right, underline, indent, etc.
-  $page['page_bottom']['photoswipe']['#markup'] = '
-    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="pswp__bg"></div>
-        <div class="pswp__scroll-wrap">
-            <div class="pswp__container">
-                <div class="pswp__item"></div>
-                <div class="pswp__item"></div>
-                <div class="pswp__item"></div>
-            </div>
-            <div class="pswp__ui pswp__ui--hidden">
-                <div class="pswp__top-bar">
-                    <div class="pswp__counter"></div>
-                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-                    <button class="pswp__button pswp__button--share" title="Share"></button>
-                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-                    <div class="pswp__preloader">
-                        <div class="pswp__preloader__icn">
-                          <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                          </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                    <div class="pswp__share-tooltip"></div>
-                </div>
-                <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-                </button>
-                <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-                </button>
-                <div class="pswp__caption">
-                    <div class="pswp__caption__center"></div>
-                </div>
-              </div>
-            </div>
-    </div>
-  ';
-}
-
-
-/**
- * Implements hook_menu().
- */
-function photoswipe_menu() {
-  $items = array();
-  $items['admin/config/media/photoswipe'] = array(
-    'title' => 'PhotoSwipe',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('photoswipe_admin_settings'),
-    'access arguments' => array('administer site configuration'),
-    'description' => 'Configure settings for PhotoSwipe javascript library.',
+  $page['page_bottom']['photoswipe'] = array(
+    '#theme' => 'photoswipe_container',
   );
-  return $items;
 }
-
-/**
- * Configure global settings for PhotoSwipe.
- */
-function photoswipe_admin_settings($form, &$form_state) {
-  $form['photoswipe']['photoswipe_jquery_mobile'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Force jQuery Mobile integration'),
-    '#default_value' => variable_get('photoswipe_jquery_mobile', FALSE),
-    '#description' => t('By default, PhotoSwipe will try and work this out for you. Enable this if PhotoSwipe fails to do so.'),
-  );
-  return system_settings_form($form);
-}
-
 
 /**
  * Implements hook_field_formatter_info().
@@ -303,61 +237,36 @@ function photoswipe_field_formatter_view($entity_type, $entity, $field, $instanc
 }
 
 /**
- * Get photoswipe version.
- */
-function photoswipe_get_version($path = NULL) {
-  $version = drupal_static(__FUNCTION__);
-  if (!empty($version)) {
-    return $version;
-  }
-  if (!$path) {
-    $path = libraries_get_path('photoswipe');
-  }
-  foreach (glob($path . "/code.photoswipe.jquery-*.min.js") as $filename) {
-    $version = str_replace(array($path, '/code.photoswipe.jquery-', '.min.js'), '', $filename);
-  }
-  return $version;
-}
-
-/**
  * Get photoswipe default settings.
+ *
+ * @see http://photoswipe.com/documentation/options.html
  */
 function photoswipe_get_default_settings() {
   return array(
-    'allowUserZoom' => FALSE,
-    'autoStartSlideshow' => FALSE,
-    'allowRotationOnUserZoom' => FALSE,
-    'backButtonHideEnabled' => TRUE,
-    'captionAndToolbarAutoHideDelay' => 5000,
-    'captionAndToolbarFlipPosition' => FALSE,
-    'captionAndToolbarHide' => FALSE,
-    'captionAndToolbarOpacity' => 0.8,
-    'captionAndToolbarShowEmptyCaptions' => TRUE,
-    'cacheMode' => 'normal',
-    'doubleTapSpeed' => 300,
-    'doubleTapZoomLevel' => '2.5',
-    'enableDrag' => TRUE ,
-    'enableKeyboard' => TRUE,
-    'enableMouseWheel' => TRUE ,
-    'fadeInSpeed' => 250,
-    'fadeOutSpeed' => 250,
-    'imageScaleMethod' => 'fit',
-    'invertMouseWheel' => FALSE,
-    'jQueryMobile' => variable_get('photoswipe_jquery_mobile'),
-    'jQueryMobileDialogHash' => '&ui-state=dialog',
+    'index' => 0,
+    'getThumbBoundsFn' => NULL,
+    'showAnimationDuration' => 333,
+    'hideAnimationDuration' => 333,
+    'showHideOpacity' => FALSE,
+    'bgOpacity' => 1,
+    'spacing' => 0.12,
+    'allowPanToNext' => TRUE,
+    'maxSpreadZoom' => 2,
+    'getDoubleTapZoom' => NULL,
     'loop' => TRUE,
-    'margin' => 20,
-    'maxUserZoom' => '5.0',
-    'minUserZoom' => '0.5',
-    'mouseWheelSpeed' => 500,
-    'nextPreviousSlideSpeed' => 0,
-    'preventHide' => FALSE,
-    'preventSlideshow' => FALSE,
-    'slideshowDelay' => 3000,
-    'slideSpeed' => 250,
-    'swipeThreshold' => 50,
-    'swipeTimeThreshold' => 250,
-    'slideTimingFunction' => 'ease-out',
-    'zIndex' => 1000,
+    'pinchToClose' => TRUE,
+    'closeOnScroll' => TRUE,
+    'closeOnVerticalDrag' => TRUE,
+    'mouseUsed' => FALSE,
+    'escKey' => TRUE,
+    'arrowKeys' => TRUE,
+    'history' => TRUE,
+    'galleryUID' => 1,
+    'errorMsg' => '<div class="pswp__error-msg">' . t('<a href="%url%" target="_blank">The image</a> could not be loaded.') . '</div>',
+    'preload' => array(1, 1),
+    'mainClass' => NULL,
+    'getNumItemsFn' => NULL,
+    'focus' => TRUE,
+    'isClickableElement' => NULL,
   );
 }
