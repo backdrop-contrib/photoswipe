@@ -112,6 +112,9 @@ function photoswipe_libraries_info() {
  * Implements hook_page_build().
  */
 function photoswipe_page_build(&$page) {
+  if (variable_get('photoswipe_always_load_non_admin', FALSE) && !path_is_admin(current_path())) {
+    photoswipe_load_assets();
+  }
   if (photoswipe_assets_loaded()) {
     $page['page_bottom']['photoswipe'] = array(
       '#theme' => 'photoswipe_container',
@@ -230,12 +233,10 @@ function photoswipe_field_formatter_view($entity_type, $entity, $field, $instanc
  * Loads photoswipe assets.
  */
 function photoswipe_load_assets() {
-  static $loaded;
-
-  if (!$loaded) {
+  if (!photoswipe_assets_loaded()) {
     libraries_load('photoswipe');
 
-    drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js');
+    drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js', array('scope' => 'footer'));
 
     $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
     drupal_add_js(array(
@@ -256,7 +257,7 @@ function photoswipe_load_assets() {
  * @return bool
  */
 function photoswipe_assets_loaded($loaded = NULL) {
-  static $status;
+  $status = &drupal_static(__FUNCTION__);
 
   if ($loaded) {
     $status = $loaded;

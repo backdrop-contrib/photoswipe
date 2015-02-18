@@ -56,4 +56,5 @@ e.g.
 It might be needed to load photoswipe assets in case they are not already loaded
 To do so just call
 photoswipe_load_assets();
-in a THEME_preprocess_html() implementation of your theme.
+Or force them to load on all non-admin pages
+variable_set('photoswipe_always_load_non_admin', TRUE);
