@@ -10,6 +10,23 @@
  */
 define('PHOTOSWIPE_MIN_PLUGIN_VERSION', '4.0.0');
 
+/**
+ * Implements hook_menu().
+ */
+function photoswipe_menu() {
+  $items = array();
+
+  $items['admin/config/media/photoswipe'] = array(
+    'title' => 'PhotoSwipe',
+    'description' => 'Adjust PhotoSwipe settings.',
+    'file' => 'photoswipe.admin.inc',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('photoswipe_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $items;
+}
 
 /**
  * Implements hook_theme().
