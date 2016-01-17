@@ -150,6 +150,8 @@ function photoswipe_field_formatter_info() {
       'settings' => array(
         'photoswipe_node_style' => '',
         'photoswipe_image_style' => '',
+        'photoswipe_caption' => '',
+        'photoswipe_view_mode' => '',
       ),
     ),
   );
@@ -180,6 +182,32 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
     '#empty_option' => t('None (original image)'),
     '#options' => $image_styles,
     '#description' => t('Image style to use in the Photoswipe.'),
+  );
+  // Set our caption options
+  $caption_options = array(
+    'alt' => t('Image Alt Tag'),
+    'title' => t('Image Title Tag'),
+    'node_title' => t('Node Title'),
+  );
+  // Add the other node fields as options
+  foreach ($form['#fields'] as $node_field) {
+    if ($node_field != $instance['field_name']) {
+      $caption_options[$node_field] = $node_field;
+    }
+  }
+
+  $element['photoswipe_caption'] = array(
+    '#title' => t('Photoswipe Image Caption'),
+    '#type' => 'select',
+    '#default_value' => ($settings['photoswipe_caption']) ? $settings['photoswipe_caption'] : 'alt',
+    '#options' => $caption_options,
+    '#description' => t('Which field should be used for the Caption?'),
+  );
+
+  // add the current view mode so we can control the view mode for node fields
+  $element['photoswipe_view_mode'] = array(
+    '#type' => 'hidden',
+    '#value' => $view_mode,
   );
 
   return $element;
@@ -214,6 +242,24 @@ function photoswipe_field_formatter_settings_summary($field, $instance, $view_mo
   }
   else {
     $summary[] = t('photoswipe image style: Original image');
+  }
+
+  if (isset($settings['photoswipe_caption'])) {
+    $caption_options = array(
+      'alt' => t('Image Alt Tag'),
+      'title' => t('Image Title Tag'),
+      'node_title' => t('Node Title'),
+    );
+    if (array_key_exists($settings['photoswipe_caption'], $caption_options)) {
+      $caption_setting = $caption_options[$settings['photoswipe_caption']];
+    }
+    else {
+      $caption_setting = $settings['photoswipe_caption'];
+    }
+    $summary[] = t('Photoswipe Caption: @field', array('@field' => $caption_setting));
+  }
+  else {
+    $summary[] = t('Photoswipe Caption: Image Alt Tag');
   }
 
   return implode('<br />', $summary);

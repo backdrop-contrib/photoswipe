@@ -55,9 +55,31 @@ function theme_photoswipe_image_formatter($variables) {
     $path = file_create_url($image['path']);
   }
 
-  return theme('photoswipe_imagefield', array('image' => $image, 'path' => $path, 'dimensions' => $dimensions['width'] . 'x' . $dimensions['height']));
-}
+  // Set Caption for this image
+  if ($caption_setting = $settings['photoswipe_caption']) {
+    switch ($caption_setting) {
+      case 'alt':
+        $caption = $image[$caption_setting];
+        break;
+      case 'title':
+        $caption = $image[$caption_setting];
+        break;
+      case 'node_title':
+        $caption = $node->title;
+        break;
+      default:
+        $view_mode = ($settings['photoswipe_view_mode']) ? $settings['photoswipe_view_mode'] : 'default';
+        $thefield = field_view_field('node', $node, $caption_setting, $view_mode);
+        $caption = drupal_render($thefield);
+        break;
+    }
+  }
+  else {
+    $caption = $alt;
+  }
 
+  return theme('photoswipe_imagefield', array('image' => $image, 'path' => $path, 'dimensions' => $dimensions['width'] . 'x' . $dimensions['height'], 'caption' => $caption));
+}
 
 /**
  * Returns HTML for an image using a specific Photoswipe image style.
@@ -83,7 +105,7 @@ function theme_photoswipe_imagefield($variables) {
     'attributes' => array(
       'class' => implode(' ', $class),
       'data-size' => $variables['dimensions'],
-      'data-overlay-title' => $variables['image']['alt']
+      'data-overlay-title' => $variables['caption']
     )
   );
 
