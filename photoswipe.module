@@ -204,7 +204,7 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
     '#description' => t('Which field should be used for the Caption?'),
   );
 
-  // add the current view mode so we can control the view mode for node fields
+  // Add the current view mode so we can control the view mode for node fields.
   $element['photoswipe_view_mode'] = array(
     '#type' => 'hidden',
     '#value' => $view_mode,

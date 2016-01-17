@@ -56,7 +56,8 @@ function theme_photoswipe_image_formatter($variables) {
   }
 
   // Set Caption for this image
-  if ($caption_setting = $settings['photoswipe_caption']) {
+  if (isset($settings['photoswipe_caption'])) {
+    $caption_setting = $settings['photoswipe_caption'];
     switch ($caption_setting) {
       case 'alt':
         $caption = $image[$caption_setting];
@@ -69,8 +70,8 @@ function theme_photoswipe_image_formatter($variables) {
         break;
       default:
         $view_mode = ($settings['photoswipe_view_mode']) ? $settings['photoswipe_view_mode'] : 'default';
-        $thefield = field_view_field('node', $node, $caption_setting, $view_mode);
-        $caption = drupal_render($thefield);
+        $field_view = field_view_field('node', $node, $caption_setting, $view_mode);
+        $caption = drupal_render($field_view);
         break;
     }
   }
