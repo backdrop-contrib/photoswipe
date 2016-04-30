@@ -77,3 +77,13 @@ function photoswipe_requirements($phase) {
 function photoswipe_update_7001() {
   // Do nothing.
 }
+
+/**
+ * Trigger cache clear.
+ *
+ * Empty update function to trigger cache clear after changing field formatter
+ * settings.
+ */
+function photoswipe_update_7002() {
+  // Do nothing.
+}
