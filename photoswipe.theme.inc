@@ -37,6 +37,10 @@ function theme_photoswipe_image_formatter($variables) {
     'style_name' => $settings['photoswipe_node_style'],
   );
 
+  if ($variables['delta'] == 0 && !empty($settings['photoswipe_node_style_first'])) {
+    $image['style_name'] = $settings['photoswipe_node_style_first'];
+  }
+
   $dimensions = array();
   if (isset($item['width']) && isset($item['height'])) {
     $image['width'] = $dimensions['width'] = $item['width'];

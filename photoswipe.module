@@ -49,6 +49,7 @@ function photoswipe_theme() {
         'node' => NULL,
         'field' => array(),
         'display_settings' => array(),
+        'delta' => NULL,
       ),
       'file' => 'photoswipe.theme.inc',
     ),
@@ -148,6 +149,7 @@ function photoswipe_field_formatter_info() {
       'label' => t('Photoswipe'),
       'field types' => array('image'),
       'settings' => array(
+        'photoswipe_node_style_first' => '',
         'photoswipe_node_style' => '',
         'photoswipe_image_style' => '',
         'photoswipe_caption' => '',
@@ -167,6 +169,14 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
   $image_styles = image_style_options(FALSE);
   $image_styles_hide = $image_styles;
   $image_styles_hide['hide'] = t('Hide (do not display image)');
+  $element['photoswipe_node_style_first'] = array(
+    '#title' => t('Node image style for first image'),
+    '#type' => 'select',
+    '#default_value' => $settings['photoswipe_node_style_first'],
+    '#empty_option' => t('No special style.'),
+    '#options' => $image_styles_hide,
+    '#description' => t('Image style to use in the content for the first image.'),
+  );
   $element['photoswipe_node_style'] = array(
     '#title' => t('Node image style'),
     '#type' => 'select',
@@ -236,6 +246,9 @@ function photoswipe_field_formatter_settings_summary($field, $instance, $view_mo
   else {
     $summary[] = t('Node image style: Original image');
   }
+  if (isset($image_styles[$settings['photoswipe_node_style_first']])) {
+    $summary[] = t('Node image style of first image: @style', array('@style' => $image_styles[$settings['photoswipe_node_style_first']]));
+  }
 
   if (isset($image_styles[$settings['photoswipe_image_style']])) {
     $summary[] = t('Photoswipe image style: @style', array('@style' => $image_styles[$settings['photoswipe_image_style']]));
@@ -286,6 +299,7 @@ function photoswipe_field_formatter_view($entity_type, $entity, $field, $instanc
       '#node' => $entity,
       '#field' => $field,
       '#display_settings' => $display['settings'],
+      '#delta' => $delta,
     );
   }
 
