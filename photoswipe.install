@@ -5,17 +5,6 @@
  * Install, uninstall and update hooks for Photswipe module.
  */
 
-
-/**
- * Implements hook_enable().
- */
-function photoswipe_enable() {
-  // Set jquery 1.7 as the jquery_update version.
-  if (variable_get('jquery_update_jquery_version', 0) < 1.7) {
-    variable_set('jquery_update_jquery_version', '1.7');
-  }
-}
-
 /**
  * Implements hook_uninstall().
  */
@@ -45,7 +34,7 @@ function photoswipe_requirements($phase) {
         'title' => $t('Photoswipe plugin'),
         'value' => $t('@e: At least @a', array('@e' => $error_type, '@a' => PHOTOSWIPE_MIN_PLUGIN_VERSION)),
         'severity' => REQUIREMENT_ERROR,
-        'description' => $t('!error You need to download the !photoswipe, extract the archive and place the colorbox directory in the %path directory on your server.', array('!error' => $error_message, '!photoswipe' => l($t('Photoswipe plugin'), $library['download url']), '%path' => 'sites/all/libraries')),
+        'description' => $t('!error You need to download the !photoswipe, extract the archive and place the photoswipe directory in the %path directory on your server.', array('!error' => $error_message, '!photoswipe' => l($t('Photoswipe plugin'), $library['download url']), '%path' => 'sites/all/libraries')),
       );
     }
     elseif (version_compare($library['version'], PHOTOSWIPE_MIN_PLUGIN_VERSION, '>=')) {
@@ -61,6 +50,16 @@ function photoswipe_requirements($phase) {
         'value' => $t('At least @a', array('@a' => PHOTOSWIPE_MIN_PLUGIN_VERSION)),
         'severity' => REQUIREMENT_ERROR,
         'description' => $t('You need to download a later version of the !photoswipe and replace the old version located in the %path directory on your server.', array('!photoswipe' => l($t('Photoswipe plugin'), $library['download url']), '%path' => $library['library path'])),
+      );
+    }
+    // Check for the minimum required jQuery version.
+    $jquery_version = variable_get('jquery_update_jquery_version', '1.10');
+    if (!version_compare($jquery_version, '1.7', '>=')) {
+      $requirements['photoswipe_plugin'] = array(
+        'description' => $t('Incorrect jQuery version detected. Photoswipe requires jQuery 1.7 or higher. Please change your <a href="!settings">jQuery Update settings</a>.', array('!settings' => url('admin/config/development/jquery_update'))),
+        'severity' => REQUIREMENT_ERROR,
+        'value' => $t('Not installed. Please enable jQuery 1.7 or higher.'),
+        'title' => $t('Photoswipe plugin'),
       );
     }
   }
