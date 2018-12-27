@@ -349,7 +349,7 @@ function photoswipe_assets_loaded($loaded = NULL) {
  * @see http://photoswipe.com/documentation/options.html
  */
 function photoswipe_get_default_settings() {
-  return array(
+  $settings = array(
     //'index' => 0,
     //'getThumbBoundsFn' => NULL,
     'showAnimationDuration' => 333,
@@ -376,4 +376,9 @@ function photoswipe_get_default_settings() {
     'focus' => TRUE,
     //'isClickableElement' => NULL,
   );
+
+  // Add ability to override default settings using hook_photoswipe_default_settings_alter().
+  drupal_alter('photoswipe_default_settings', $settings);
+
+  return $settings;
 }
