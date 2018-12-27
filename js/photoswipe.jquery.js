@@ -23,12 +23,12 @@
           $gallery.on('click', Drupal.behaviors.photoswipe.onThumbnailsClick);
         });
       }
-      var $imagesWithoutGalleries = $('a.photoswipe', context).filter(function(elem) {
+      var $imagesWithoutGalleries = $('a.photoswipe', context).filter( function(elem) {
         return !$(this).parents('.photoswipe-gallery').length;
       });
       if ($imagesWithoutGalleries.length) {
         // We have no galleries just individual images.
-        $imagesWithoutGalleries.each(function(index) {
+        $imagesWithoutGalleries.each(function (index) {
           $imageLink = $(this);
           $imageLink.wrap('<span class="photoswipe-gallery"></span>');
           var $gallery = $imageLink.parent();
@@ -40,8 +40,8 @@
 
       // Parse URL and open gallery if it contains #&pid=3&gid=1
       var hashData = this.parseHash();
-      if(hashData.pid > 0 && hashData.gid > 0) {
-        this.openPhotoSwipe(hashData.pid - 1 ,  $($galleries[hashData.gid - 1]));
+      if (hashData.pid > 0 && hashData.gid > 0) {
+        this.openPhotoSwipe(hashData.pid - 1, $($galleries[hashData.gid - 1]));
       }
     },
     /**
@@ -50,7 +50,7 @@
      * Code taken from http://photoswipe.com/documentation/getting-started.html
      * and adjusted accordingly.
      */
-    onThumbnailsClick: function(e) {
+    onThumbnailsClick: function (e) {
       e = e || window.event;
       e.preventDefault ? e.preventDefault() : e.returnValue = false;
 
@@ -78,7 +78,7 @@
      * Code taken from http://photoswipe.com/documentation/getting-started.html
      * and adjusted accordingly.
      */
-    openPhotoSwipe: function(index, galleryElement, options) {
+    openPhotoSwipe: function (index, galleryElement, options) {
       var pswpElement = $('.pswp')[0];
       var items = [];
       options = options || Drupal.behaviors.photoswipe.photoSwipeOptions;
@@ -86,13 +86,14 @@
       var images = galleryElement.find('a.photoswipe');
       images.each(function (index) {
         var $image = $(this);
-        size = $image.data('size') ? $image.data('size').split('x') : ['',''];
+        size = $image.data('size') ? $image.data('size').split('x') : ['', ''];
         items.push(
           {
-            src : $image.attr('href'),
+            src: $image.attr('href'),
             w: size[0],
             h: size[1],
-            title : $image.data('overlay-title')
+            title: $image.data('overlay-title'),
+            msrc: $image.find('img').attr('src')
           }
         );
       })
@@ -101,6 +102,17 @@
       options.index = index;
       // define gallery index (for URL)
       options.galleryUID = galleryElement.data('pswp-uid');
+
+      // Add zoom animation function:
+      options.getThumbBoundsFn = function (index) {
+        var tn = galleryElement.find('a.photoswipe:eq(' + index + ') img');
+        if (tn.length == 0) {
+          tn = galleryElement.find('a.photoswipe:eq(0) img');
+        }
+        var tw = tn.width();
+        var tpos = tn.offset();
+        return { x: tpos.left, y: tpos.top, w: tw };
+      }
 
       // Pass data to PhotoSwipe and initialize it
       var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
@@ -113,9 +125,9 @@
      * Code taken from http://photoswipe.com/documentation/getting-started.html
      * and adjusted accordingly.
      */
-    parseHash: function() {
+    parseHash: function () {
       var hash = window.location.hash.substring(1),
-      params = {};
+        params = {};
 
       if (hash.length < 5) {
         return params;
@@ -133,11 +145,11 @@
         params[pair[0]] = pair[1];
       }
 
-      if(params.gid) {
+      if (params.gid) {
         params.gid = parseInt(params.gid, 10);
       }
 
-      if(!params.hasOwnProperty('pid')) {
+      if (!params.hasOwnProperty('pid')) {
         return params;
       }
       params.pid = parseInt(params.pid, 10);
