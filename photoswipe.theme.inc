@@ -99,7 +99,12 @@ function theme_photoswipe_image_formatter($variables) {
 function theme_photoswipe_imagefield($variables) {
   $class = array('photoswipe');
   if (!empty($variables['image']['style_name'])) {
-    $image = theme('image_style', $variables['image']);
+    if ($variables['image']['style_name'] == 'hide') {
+      $image = '<!-- hidden image -->';
+    }
+    else {
+      $image = theme('image_style', $variables['image']);
+    }
   }
   else {
     $image = theme('image', $variables['image']);
