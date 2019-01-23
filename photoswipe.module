@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Photswipe integration with Drupal module.
+ * Photoswipe integration with Backdrop module.
  */
 
 /**
@@ -20,7 +20,7 @@ function photoswipe_menu() {
     'title' => 'PhotoSwipe',
     'description' => 'Adjust PhotoSwipe settings.',
     'file' => 'photoswipe.admin.inc',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('photoswipe_admin_settings'),
     'access arguments' => array('administer site configuration'),
   );
@@ -89,35 +89,35 @@ function photoswipe_libraries_info() {
     'files' => array(
       'js' => array(
         'photoswipe.min.js',
-        'photoswipe-ui-default.min.js'
+        'photoswipe-ui-default.min.js',
       ),
       'css' => array(
         'photoswipe.css',
-        'default-skin/default-skin.css'
-      )
+        'default-skin/default-skin.css',
+      ),
     ),
     'variants' => array(
       'minified' => array(
         'files' => array(
           'js' => array(
             'photoswipe.min.js',
-            'photoswipe-ui-default.min.js'
+            'photoswipe-ui-default.min.js',
           ),
           'css' => array(
-            'photoswipe.css'
-          )
+            'photoswipe.css',
+          ),
         ),
       ),
       'source' => array(
         'files' => array(
           'js' => array(
             'photoswipe.js',
-            'photoswipe-ui-default.js'
+            'photoswipe-ui-default.js',
           ),
           'css' => array(
             'photoswipe.css',
-            'default-skin/default-skin.css'
-          )
+            'default-skin/default-skin.css',
+          ),
         ),
       ),
     ),
@@ -127,16 +127,27 @@ function photoswipe_libraries_info() {
 }
 
 /**
- * Implements hook_page_build().
+ * Implements hook_config_info().
  */
-function photoswipe_page_build(&$page) {
-  if (variable_get('photoswipe_always_load_non_admin', FALSE) && !path_is_admin(current_path())) {
+function photoswipe_config_info() {
+  $prefixes['photoswipe.settings'] = array(
+    'label' => t('Photoswipe settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
+}
+
+/**
+ * Implements hook_preprocess_page().
+().
+ */
+
+function photoswipe_preprocess_page(&$variables) {
+  if (config_get('photoswipe.settings', 'photoswipe_always_load_non_admin') && !path_is_admin(current_path())) {
     photoswipe_load_assets();
   }
   if (photoswipe_assets_loaded()) {
-    $page['page_bottom']['photoswipe'] = array(
-      '#theme' => 'photoswipe_container',
-    );
+    $variables['page_bottom'] = theme ('photoswipe_container', $variables);
   }
 }
 
@@ -313,10 +324,10 @@ function photoswipe_load_assets() {
   if (!photoswipe_assets_loaded()) {
     libraries_load('photoswipe');
 
-    drupal_add_js(drupal_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js', array('scope' => 'footer'));
+    backdrop_add_js(backdrop_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js', array('scope' => 'footer'));
 
-    $settings = variable_get('photoswipe_settings', photoswipe_get_default_settings());
-    drupal_add_js(array(
+    $settings = config_get('photoswipe.settings','photoswipe_settings');
+    backdrop_add_js(array(
       'photoswipe' => array(
         'options' => $settings,
       ),
@@ -334,7 +345,7 @@ function photoswipe_load_assets() {
  * @return bool
  */
 function photoswipe_assets_loaded($loaded = NULL) {
-  $status = &drupal_static(__FUNCTION__);
+  $status = &backdrop_static(__FUNCTION__);
 
   if ($loaded) {
     $status = $loaded;
@@ -378,7 +389,7 @@ function photoswipe_get_default_settings() {
   );
 
   // Add ability to override default settings using hook_photoswipe_default_settings_alter().
-  drupal_alter('photoswipe_default_settings', $settings);
+  backdrop_alter('photoswipe_default_settings', $settings);
 
   return $settings;
 }

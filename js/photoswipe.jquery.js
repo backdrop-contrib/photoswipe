@@ -1,5 +1,5 @@
-(function ($, Drupal, PhotoSwipe, PhotoSwipeUI_Default) {
-  Drupal.behaviors.photoswipe = {
+(function ($, Backdrop, PhotoSwipe, PhotoSwipeUI_Default) {
+  Backdrop.behaviors.photoswipe = {
     /**
      * PhotoSwipe Options, coming from Drupal.settings.
      */
@@ -20,7 +20,7 @@
         $galleries.each( function (index) {
           var $gallery = $(this);
           $gallery.attr('data-pswp-uid', index + 1);
-          $gallery.on('click', Drupal.behaviors.photoswipe.onThumbnailsClick);
+          $gallery.on('click', Backdrop.behaviors.photoswipe.onThumbnailsClick);
         });
       }
       var $imagesWithoutGalleries = $('a.photoswipe', context).filter( function(elem) {
@@ -33,7 +33,7 @@
           $imageLink.wrap('<span class="photoswipe-gallery"></span>');
           var $gallery = $imageLink.parent();
           $gallery.attr('data-pswp-uid', index + 1);
-          $gallery.on('click', Drupal.behaviors.photoswipe.onThumbnailsClick);
+          $gallery.on('click', Backdrop.behaviors.photoswipe.onThumbnailsClick);
           $galleries.push($gallery);
         });
       }
@@ -70,7 +70,7 @@
       index = clickedListItem.index('.photoswipe');
       if (index >= 0) {
         // open PhotoSwipe if valid index found
-        Drupal.behaviors.photoswipe.openPhotoSwipe(index, $clickedGallery);
+        Backdrop.behaviors.photoswipe.openPhotoSwipe(index, $clickedGallery);
       }
       return false;
     },
@@ -81,7 +81,7 @@
     openPhotoSwipe: function (index, galleryElement, options) {
       var pswpElement = $('.pswp')[0];
       var items = [];
-      options = options || Drupal.behaviors.photoswipe.photoSwipeOptions;
+      options = options || Backdrop.behaviors.photoswipe.photoSwipeOptions;
 
       var images = galleryElement.find('a.photoswipe');
       images.each(function (index) {
@@ -157,4 +157,4 @@
       return params;
     }
   };
-})(jQuery, Drupal, PhotoSwipe, PhotoSwipeUI_Default);
+})(jQuery, Backdrop, PhotoSwipe, PhotoSwipeUI_Default);

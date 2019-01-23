@@ -31,7 +31,7 @@ function theme_photoswipe_image_formatter($variables) {
     $title = $item['field_file_image_title_text'][LANGUAGE_NONE][0]['value'];
   }
   $image = array(
-    'path' => $item['uri'],
+    'uri' => $item['uri'],
     'alt' => $alt,
     'title' => $title,
     'style_name' => $settings['photoswipe_node_style'],
@@ -48,7 +48,7 @@ function theme_photoswipe_image_formatter($variables) {
   }
 
   if ($style_name = $settings['photoswipe_image_style']) {
-    $path = image_style_url($style_name, $image['path']);
+    $path = image_style_url($style_name, $image['uri']);
     $dimensions = array(
       'width' => $item['width'],
       'height' => $item['height'],
@@ -56,7 +56,7 @@ function theme_photoswipe_image_formatter($variables) {
     image_style_transform_dimensions($style_name, $dimensions);
   }
   else {
-    $path = file_create_url($image['path']);
+    $path = file_create_url($image['uri']);
   }
 
   // Set Caption for this image
@@ -75,7 +75,7 @@ function theme_photoswipe_image_formatter($variables) {
       default:
         $view_mode = ($settings['photoswipe_view_mode']) ? $settings['photoswipe_view_mode'] : 'default';
         $field_view = field_view_field('node', $node, $caption_setting, $view_mode);
-        $caption = drupal_render($field_view);
+        $caption = backdrop_render($field_view);
         break;
     }
   }
@@ -115,8 +115,8 @@ function theme_photoswipe_imagefield($variables) {
     'attributes' => array(
       'class' => implode(' ', $class),
       'data-size' => $variables['dimensions'],
-      'data-overlay-title' => $variables['caption']
-    )
+      'data-overlay-title' => $variables['caption'],
+    ),
   );
 
   return l($image, $variables['path'], $options);

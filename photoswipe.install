@@ -5,16 +5,6 @@
  * Install, uninstall and update hooks for Photswipe module.
  */
 
-/**
- * Implements hook_uninstall().
- */
-function photoswipe_uninstall() {
-  // Remove photoswipe variables.
-  db_delete('variable')
-  ->condition('name', 'photoswipe_%', 'LIKE')
-  ->execute();
-  cache_clear_all('variables', 'cache_bootstrap');
-}
 
 /**
  * Implements hook_requirements().
@@ -26,7 +16,7 @@ function photoswipe_requirements($phase) {
   if ($phase == 'runtime') {
     $t = get_t();
     $library = libraries_detect('photoswipe');
-    $error_type = isset($library['error']) ? drupal_ucfirst($library['error']) : '';
+    $error_type = isset($library['error']) ? backdrop_ucfirst($library['error']) : '';
     $error_message = isset($library['error message']) ? $library['error message'] : '';
 
     if (empty($library['installed'])) {
@@ -34,7 +24,7 @@ function photoswipe_requirements($phase) {
         'title' => $t('Photoswipe plugin'),
         'value' => $t('@e: At least @a', array('@e' => $error_type, '@a' => PHOTOSWIPE_MIN_PLUGIN_VERSION)),
         'severity' => REQUIREMENT_ERROR,
-        'description' => $t('!error You need to download the !photoswipe, extract the archive and place the photoswipe directory in the %path directory on your server.', array('!error' => $error_message, '!photoswipe' => l($t('Photoswipe plugin'), $library['download url']), '%path' => 'sites/all/libraries')),
+        'description' => $t('!error You need to download the !photoswipe, extract the archive and place the photoswipe directory in the %path directory on your server.', array('!error' => $error_message, '!photoswipe' => l($t('Photoswipe plugin'), $library['download url']), '%path' => 'libraries')),
       );
     }
     elseif (version_compare($library['version'], PHOTOSWIPE_MIN_PLUGIN_VERSION, '>=')) {
@@ -52,37 +42,28 @@ function photoswipe_requirements($phase) {
         'description' => $t('You need to download a later version of the !photoswipe and replace the old version located in the %path directory on your server.', array('!photoswipe' => l($t('Photoswipe plugin'), $library['download url']), '%path' => $library['library path'])),
       );
     }
-    // Check for the minimum required jQuery version.
-    $jquery_version = variable_get('jquery_update_jquery_version', '1.10');
-    if (!version_compare($jquery_version, '1.7', '>=')) {
-      $requirements['photoswipe_plugin'] = array(
-        'description' => $t('Incorrect jQuery version detected. Photoswipe requires jQuery 1.7 or higher. Please change your <a href="!settings">jQuery Update settings</a>.', array('!settings' => url('admin/config/development/jquery_update'))),
-        'severity' => REQUIREMENT_ERROR,
-        'value' => $t('Not installed. Please enable jQuery 1.7 or higher.'),
-        'title' => $t('Photoswipe plugin'),
-      );
-    }
   }
 
   return $requirements;
 }
 
+
 /**
- * Trigger cache clear.
- *
- * Empty update function to trigger cache clear after changing field formatter
- * settings.
+ * Implements hook_update_last_removed().
  */
-function photoswipe_update_7001() {
-  // Do nothing.
+function photoswipe_update_last_removed() {
+  return 7002;
 }
 
 /**
- * Trigger cache clear.
- *
- * Empty update function to trigger cache clear after changing field formatter
- * settings.
+ * Implements hook_update_N().
  */
-function photoswipe_update_7002() {
-  // Do nothing.
+function photoswipe_update_1000() {
+  $config = config('photoswipe.settings');
+  $config->set('photoswipe_always_load_non_admin', update_variable_get('photoswipe_always_load_non_admin', 'FALSE'));
+  $config->set('photoswipe_settings', update_variable_get('photoswipe_settings'));
+  update_variable_del('photoswipe_always_load_non_admin');
+  update_variable_del('photoswipe_settings');
 }
+
+
