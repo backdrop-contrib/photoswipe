@@ -8,24 +8,15 @@ It is a port to Backdrop of the Drupal module, v7.x-2.0 beta 4 (Dec 2018).
 ## Dependencies
 
 It depends on the third party PhotoSwipe library described at https://photoswipe.com.
+This library is included in this module.
 
-It also currently depends on the Backdrop 'Libraries' contributed module
+
 
 
 ## Installation
 
-1. Download, install and enable the "Libraries API" module.
-
-2. Download, install and enable this Photoswipe module.
-
-3. Install third party PhotoSwipe software as follows:
-     Create a libraries directory for your site if one does not yet exist.
-     Create a new folder 'photoswipe' within this libraries directory.
-     Download the PhotoSwipe 4.x source from PhotoSwipe website
-     (e.g. https://github.com/dimsemenov/PhotoSwipe/archive/v4.0.5.zip)
-     Unarchive it and place the 'dist' folder into this "libraries/photoswipe" folder. 
-
-4. The site status report should now show that this library is installed
+Install this module using the official Backdrop CMS instructions at
+  https://backdropcms.org/guide/modules.
 
 
 ## Usage

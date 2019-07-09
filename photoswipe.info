@@ -2,5 +2,4 @@ name = PhotoSwipe
 description = Javascript-based photo gallery display for your Backdrop website (very sleek with mobile browsers).
 backdrop = 1.x
 type = module
-dependencies[] = libraries
 configure = admin/config/media/photoswipe

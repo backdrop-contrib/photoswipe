@@ -6,11 +6,6 @@
  */
 
 /**
- * The minimum PhotoSwipe version we support.
- */
-define('PHOTOSWIPE_MIN_PLUGIN_VERSION', '4.0.0');
-
-/**
  * Implements hook_menu().
  */
 function photoswipe_menu() {
@@ -61,68 +56,30 @@ function photoswipe_theme() {
   );
 }
 
-/**
- * Implements hook_help().
- */
-function photoswipe_help($path, $arg) {
-  switch ($path) {
-    // Main module help for the photoswipe module
-    case 'admin/help#photoswipe':
-      return '<p>' . t('PhotoSwipe provides a nice javascript-based display for photo galleries, very sleek on mobile browsers.', array('!website' => l(t('PhotoSwipe website'), 'http://www.photoswipe.com/'))) . '</p>';
-  }
-}
 
 /**
- * Implements hook_libraries_info().
+ * Implements hook_library_info().
  */
-function photoswipe_libraries_info() {
+function photoswipe_library_info() {
+  $library_path = backdrop_get_path('module', 'photoswipe') . '/library/dist';
   $libraries['photoswipe'] = array(
-    'name' => 'Photoswipe plugin',
-    'vendor url' => 'http://photoswipe.com',
-    'download url' => 'https://github.com/dimsemenov/PhotoSwipe/archive/v4.0.5.zip',
-    'path' => 'dist',
-    'version arguments' => array(
-      'file' => 'dist/photoswipe.min.js',
-      'pattern' => '@(?i:PhotoSwipe)\s-\sv?([0-9\.a-z]+)@',
-      'lines' => 5,
+    'title' => 'Photoswipe plugin',
+    'website' => 'http://photoswipe.com',
+    'download url' => 'https://github.com/dimsemenov/PhotoSwipe/releases',
+    'version' => '4.1.3',
+    'js' => array(
+      $library_path . '/photoswipe.min.js' => array(),
     ),
-    'files' => array(
-      'js' => array(
-        'photoswipe.min.js',
-        'photoswipe-ui-default.min.js',
-      ),
-      'css' => array(
-        'photoswipe.css',
-        'default-skin/default-skin.css',
-      ),
-    ),
-    'variants' => array(
-      'minified' => array(
-        'files' => array(
-          'js' => array(
-            'photoswipe.min.js',
-            'photoswipe-ui-default.min.js',
-          ),
-          'css' => array(
-            'photoswipe.css',
-          ),
-        ),
-      ),
-      'source' => array(
-        'files' => array(
-          'js' => array(
-            'photoswipe.js',
-            'photoswipe-ui-default.js',
-          ),
-          'css' => array(
-            'photoswipe.css',
-            'default-skin/default-skin.css',
-          ),
-        ),
-      ),
+    'css' => array(
+      $library_path . '/photoswipe.css' => array(),
     ),
   );
-
+  $libraries['photoswipe_ui'] = array(
+    'title' => 'Photoswipe UI Default',
+    'js' => array(
+      $library_path . '/photoswipe-ui-default.min.js' => array(),
+    ),
+   );
   return $libraries;
 }
 
