@@ -8,9 +8,7 @@ It is a port to Backdrop of the Drupal module, v7.x-2.0 beta 4 (Dec 2018).
 ## Dependencies
 
 It depends on the third party PhotoSwipe library described at https://photoswipe.com.
-This library is included in this module.
-
-
+This library is now included in this module.
 
 
 ## Installation
@@ -25,6 +23,7 @@ Install this module using the official Backdrop CMS instructions at
 The option 'Photoswipe' will now appear as a Formatter for an image field.
 Choose a predefined style for your node images (i.e. thumbnails).
 Also choose a larger style or the original image for your Photoswipe image.
+
 Within 'Multiple Field Settings' check the item 'Display all values in the same row.'
 Within 'Style Settings' for your image field, customise the field and label wrapper 
 with a custom CSS class 'photoswipe-gallery'.

@@ -1,14 +1,10 @@
-?php
+<?php
 
 /**
  * @file
  * Install, uninstall and update hooks for Photswipe module.
  */
 
-
-/**
- * Implements hook_requirements().
- */
 
 /**
  * Implements hook_update_last_removed().
