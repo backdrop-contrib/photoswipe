@@ -19,15 +19,6 @@ Install this module using the official Backdrop CMS instructions at
 
 ## Usage
 
-### Multiple images in Views
-The option 'Photoswipe' will now appear as a Formatter for an image field.
-Choose a predefined style for your node images (i.e. thumbnails).
-Also choose a larger style or the original image for your Photoswipe image.
-
-Within 'Multiple Field Settings' check the item 'Display all values in the same row.'
-Within 'Style Settings' for your image field, customise the field and label wrapper 
-with a custom CSS class 'photoswipe-gallery'.
-
 ### Multiple images in nodes
 Within 'Manage Displays' for a content type that includes images, select 'Photoswipe' 
 for the format of an image field. Then choose the settings for the node images and the
@@ -37,6 +28,15 @@ photoswipe images. Multiple images will then be displayed as a gallery.
 Photoswipe can be used similarly for fields for single images within a content type.
 In such cases Photoswipe provides a 'lightbox' type of display of the image but not,
 of course, a gallery.
+
+### Multiple images in Views
+Choose the option 'Photoswipe' as the 'Formatter' for the image field.
+Choose a predefined style for your node images (i.e. thumbnails).
+Also choose a larger style or the original image for your Photoswipe image.
+
+Within 'Multiple Field Settings' un-check the item 'Display all values in the same row.'
+Within 'Other' settings for your view, set the CSS class 'photoswipe-gallery'.
+Within 'Format' settings, un-check the row settings.
 
 ## License
 
