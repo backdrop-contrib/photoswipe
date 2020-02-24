@@ -38,6 +38,15 @@ Within 'Multiple Field Settings' un-check the item 'Display all values in the sa
 Within 'Other' settings for your view, set the CSS class 'photoswipe-gallery'.
 Within 'Format' settings, un-check the row settings.
 
+### Image captions
+Photoswipe includes an option to use the alt or title values of an image as a caption. 
+However, at the moment in Backdrop it is not easy to access and set these values
+for attached image files. [Ref. https://github.com/backdrop/backdrop-issues/issues/4007]
+
+It is now possible to add a text field to the node type and set Photoswipe to use 
+this as a caption, though this is a per-node value and is not perhaps suitable
+when using multiple images in a node.
+
 ## License
 
 This project is GPL v2 software. See the LICENSE.txt file in this directory for complete text.
