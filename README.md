@@ -40,10 +40,11 @@ Within 'Format' settings, un-check the row settings.
 
 ### Image captions
 Photoswipe includes an option to use the alt or title values of an image as a caption. 
-However, at the moment in Backdrop it is not easy to access and set these values
-for attached image files. [Ref. https://github.com/backdrop/backdrop-issues/issues/4007]
+Activate this by first enabling the alt or title options within the image field settings 
+for the relevant content type. Then in the display options for the image field select 
+the required option for the 'Photoswipe image caption' setting.
 
-It is now possible to add a text field to the node type and set Photoswipe to use 
+It is also possible to add a text field to the node type and set Photoswipe to use 
 this as a caption, though this is a per-node value and is not perhaps suitable
 when using multiple images in a node.
 
