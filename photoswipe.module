@@ -199,16 +199,36 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
     '#options' => $image_styles,
     '#description' => t('Image style to use in the Photoswipe.'),
   );
+
   // Set our caption options
   $caption_options = array(
     'alt' => t('Image Alt Tag'),
     'title' => t('Image Title Tag'),
     'node_title' => t('Node Title'),
   );
-  // Add the other node fields as options
-  foreach ($form['#fields'] as $node_field) {
-    if ($node_field != $instance['field_name']) {
-      $caption_options[$node_field] = $node_field;
+  // Add node text fields as options.
+  if(isset($form['#fields'])) {
+    foreach ($form['#fields'] as $node_field_name) {
+      if (is_text_field($node_field_name)) {
+        // Get info about this field instance.
+        $field_info = field_info_instance(
+          $instance['entity_type'],
+          $node_field_name,
+          $instance['bundle']
+        );
+        // Add this field as an option.
+        $caption_options[$node_field_name] = $field_info['label'];
+      }
+    }
+  }
+  // If in view then add captions from view text fields.
+  if(isset($form_state['view'])) {
+    // Get list of view fields.
+    $fields = $form_state['view']->display_handler->get_handlers('field');
+    // Add text fields as caption options.
+    foreach($fields as $field_name => $field){
+      if(is_text_field($field_name))
+        $caption_options[$field_name] = $field->ui_name();
     }
   }
 
