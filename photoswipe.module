@@ -6,11 +6,6 @@
  */
 
 /**
- * The minimum PhotoSwipe version we support.
- */
-define('PHOTOSWIPE_MIN_PLUGIN_VERSION', '4.0.0');
-
-/**
  * Implements hook_menu().
  */
 function photoswipe_menu() {
@@ -61,68 +56,33 @@ function photoswipe_theme() {
   );
 }
 
-/**
- * Implements hook_help().
- */
-function photoswipe_help($path, $arg) {
-  switch ($path) {
-    // Main module help for the photoswipe module
-    case 'admin/help#photoswipe':
-      return '<p>' . t('PhotoSwipe provides a nice javascript-based display for photo galleries, very sleek on mobile browsers.', array('!website' => l(t('PhotoSwipe website'), 'http://www.photoswipe.com/'))) . '</p>';
-  }
-}
 
 /**
- * Implements hook_libraries_info().
+ * Implements hook_library_info().
  */
-function photoswipe_libraries_info() {
+function photoswipe_library_info() {
+  $library_path = backdrop_get_path('module', 'photoswipe') . '/library/dist';
   $libraries['photoswipe'] = array(
-    'name' => 'Photoswipe plugin',
-    'vendor url' => 'http://photoswipe.com',
-    'download url' => 'https://github.com/dimsemenov/PhotoSwipe/archive/v4.0.5.zip',
-    'path' => 'dist',
-    'version arguments' => array(
-      'file' => 'dist/photoswipe.min.js',
-      'pattern' => '@(?i:PhotoSwipe)\s-\sv?([0-9\.a-z]+)@',
-      'lines' => 5,
+    'title' => 'PhotoSwipe',
+    'website' => 'http://photoswipe.com',
+    'version' => '4.1.3',
+    'js' => array(
+      $library_path . '/photoswipe.min.js' => array(),
     ),
-    'files' => array(
-      'js' => array(
-        'photoswipe.min.js',
-        'photoswipe-ui-default.min.js',
-      ),
-      'css' => array(
-        'photoswipe.css',
-        'default-skin/default-skin.css',
-      ),
-    ),
-    'variants' => array(
-      'minified' => array(
-        'files' => array(
-          'js' => array(
-            'photoswipe.min.js',
-            'photoswipe-ui-default.min.js',
-          ),
-          'css' => array(
-            'photoswipe.css',
-          ),
-        ),
-      ),
-      'source' => array(
-        'files' => array(
-          'js' => array(
-            'photoswipe.js',
-            'photoswipe-ui-default.js',
-          ),
-          'css' => array(
-            'photoswipe.css',
-            'default-skin/default-skin.css',
-          ),
-        ),
-      ),
+    'css' => array(
+      $library_path . '/photoswipe.css' => array(),
     ),
   );
-
+  $libraries['photoswipe_ui'] = array(
+    'title' => 'PhotoSwipeUI_default',
+    'version' => '4.1.3',
+    'js' => array(
+      $library_path . '/photoswipe-ui-default.min.js' => array(),
+    ),
+    'css' => array(
+      $library_path . '/default-skin/default-skin.css' => array(),
+    ),
+   );
   return $libraries;
 }
 
@@ -204,16 +164,36 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
     '#options' => $image_styles,
     '#description' => t('Image style to use in the Photoswipe.'),
   );
+  
   // Set our caption options
   $caption_options = array(
     'alt' => t('Image Alt Tag'),
     'title' => t('Image Title Tag'),
     'node_title' => t('Node Title'),
   );
-  // Add the other node fields as options
-  foreach ($form['#fields'] as $node_field) {
-    if ($node_field != $instance['field_name']) {
-      $caption_options[$node_field] = $node_field;
+  // Add node text fields as options.
+  if(isset($form['#fields'])) {
+    foreach ($form['#fields'] as $node_field_name) {
+      if (is_text_field($node_field_name)) {
+        // Get info about this field instance.
+        $field_info = field_info_instance(
+          $instance['entity_type'], 
+          $node_field_name, 
+          $instance['bundle']
+        );
+        // Add this field as an option.
+        $caption_options[$node_field_name] = $field_info['label'];
+      }
+    }
+  }
+  // If in view then add captions from view text fields.
+  if(isset($form_state['view'])) {
+    // Get list of view fields.
+    $fields = $form_state['view']->display_handler->get_handlers('field');
+    // Add text fields as caption options.
+    foreach($fields as $field_name => $field){
+      if(is_text_field($field_name))
+        $caption_options[$field_name] = $field->ui_name();
     }
   }
 
@@ -232,6 +212,15 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
   );
 
   return $element;
+}
+
+/*
+ * Checks if given field name belongs to one of the text type fields.
+ */
+function is_text_field($field_name) {
+  $field_info = field_info_field($field_name);
+  $text_types = array('text','text_long','text_with_summary');
+  return in_array($field_info['type'], $text_types);
 }
 
 /**
@@ -321,19 +310,18 @@ function photoswipe_field_formatter_view($entity_type, $entity, $field, $instanc
  * Loads photoswipe assets.
  */
 function photoswipe_load_assets() {
-  if (!photoswipe_assets_loaded()) {
-    libraries_load('photoswipe');
+  backdrop_add_library('photoswipe', 'photoswipe');
+  backdrop_add_library('photoswipe', 'photoswipe_ui');
 
-    backdrop_add_js(backdrop_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js', array('scope' => 'footer'));
+  backdrop_add_js(backdrop_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js', array('scope' => 'footer'));
 
-    $settings = config_get('photoswipe.settings','photoswipe_settings');
-    backdrop_add_js(array(
-      'photoswipe' => array(
-        'options' => $settings,
-      ),
-    ), array('type' => 'setting', 'scope' => JS_DEFAULT));
-    photoswipe_assets_loaded(TRUE);
-  }
+  $settings = config_get('photoswipe.settings','photoswipe_settings');
+  backdrop_add_js(array(
+    'photoswipe' => array(
+      'options' => $settings,
+    ),
+  ), array('type' => 'setting', 'scope' => JS_DEFAULT));
+  photoswipe_assets_loaded(TRUE);
 }
 
 /**

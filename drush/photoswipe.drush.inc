@@ -31,15 +31,6 @@ function photoswipe_drush_command() {
   return $items;
 }
 
-/**
- * Implements hook_drush_help().
- */
-function photoswipe_drush_help($section) {
-  switch ($section) {
-    case 'drush:photoswipe-plugin':
-      return dt('Download and install the PhotoSwipe plugin from GitHub, default location is sites/all/libraries.');
-  }
-}
 
 /**
  * Implements drush_MODULE_post_pm_enable().
