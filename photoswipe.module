@@ -57,71 +57,6 @@ function photoswipe_theme() {
 }
 
 /**
- * Implements hook_help().
- */
-function photoswipe_help($path, $arg) {
-  switch ($path) {
-    // Main module help for the photoswipe module
-    case 'admin/help#photoswipe':
-      return '<p>' . t('PhotoSwipe provides a nice javascript-based display for photo galleries, very sleek on mobile browsers.', array('!website' => l(t('PhotoSwipe website'), 'http://www.photoswipe.com/'))) . '</p>';
-  }
-}
-
-/**
- * Implements hook_libraries_info().
- */
-function photoswipe_libraries_info() {
-  $libraries['photoswipe'] = array(
-    'name' => 'Photoswipe plugin',
-    'vendor url' => 'http://photoswipe.com',
-    'download url' => 'https://github.com/dimsemenov/PhotoSwipe/archive/v4.0.5.zip',
-    'path' => 'dist',
-    'version arguments' => array(
-      'file' => 'dist/photoswipe.min.js',
-      'pattern' => '@(?i:PhotoSwipe)\s-\sv?([0-9\.a-z]+)@',
-      'lines' => 5,
-    ),
-    'files' => array(
-      'js' => array(
-        'photoswipe.min.js',
-        'photoswipe-ui-default.min.js',
-      ),
-      'css' => array(
-        'photoswipe.css',
-        'default-skin/default-skin.css',
-      ),
-    ),
-    'variants' => array(
-      'minified' => array(
-        'files' => array(
-          'js' => array(
-            'photoswipe.min.js',
-            'photoswipe-ui-default.min.js',
-          ),
-          'css' => array(
-            'photoswipe.css',
-          ),
-        ),
-      ),
-      'source' => array(
-        'files' => array(
-          'js' => array(
-            'photoswipe.js',
-            'photoswipe-ui-default.js',
-          ),
-          'css' => array(
-            'photoswipe.css',
-            'default-skin/default-skin.css',
-          ),
-        ),
-      ),
-    ),
-  );
-
-  return $libraries;
-}
-
-/**
  * Implements hook_config_info().
  */
 function photoswipe_config_info() {
@@ -199,6 +134,7 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
     '#options' => $image_styles,
     '#description' => t('Image style to use in the Photoswipe.'),
   );
+
   // Set our caption options
   $caption_options = array(
     'alt' => t('Image Alt Tag'),
@@ -325,9 +261,16 @@ function photoswipe_field_formatter_view($entity_type, $entity, $field, $instanc
  * Loads photoswipe assets.
  */
 function photoswipe_load_assets() {
-  backdrop_add_library('photoswipe', 'photoswipe');
-  backdrop_add_library('photoswipe', 'photoswipe_ui');
 
+  $module_path = backdrop_get_path('module', 'photoswipe');
+  // Load PhotoSwipe scripts and default stylesheet.
+  // Obtained from https://github.com/dimsemenov/PhotoSwipe
+  backdrop_add_js($module_path . '/library/photoswipe.min.js');
+  backdrop_add_css($module_path . '/library/photoswipe.css');
+  backdrop_add_js($module_path . '/library/photoswipe-ui-default.min.js');
+  backdrop_add_css($module_path . '/library/default-skin/default-skin.css');
+
+  // Load this module's script
   backdrop_add_js(backdrop_get_path('module', 'photoswipe') . '/js/photoswipe.jquery.js', array('scope' => 'footer'));
 
   $settings = config_get('photoswipe.settings','photoswipe_settings');

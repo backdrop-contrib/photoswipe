@@ -1,7 +1,7 @@
 (function ($, Backdrop, PhotoSwipe, PhotoSwipeUI_Default) {
   Backdrop.behaviors.photoswipe = {
     /**
-     * PhotoSwipe Options, coming from Drupal.settings.
+     * PhotoSwipe Options, coming from config settings.
      */
     photoSwipeOptions: {},
     /**
