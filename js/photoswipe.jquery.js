@@ -52,7 +52,6 @@
      */
     onThumbnailsClick: function (e) {
       e = e || window.event;
-      e.preventDefault ? e.preventDefault() : e.returnValue = false;
 
       var $clickedGallery = $(this);
 
@@ -63,16 +62,20 @@
       var clickedListItem = $eTarget.closest('.photoswipe');
 
       if (!clickedListItem) {
-        return;
+        return true;
       }
 
       // get the index of the clicked element
       index = clickedListItem.index('.photoswipe');
       if (index >= 0) {
-        // open PhotoSwipe if valid index found
+        // Open PhotoSwipe if a valid index was found.
         Backdrop.behaviors.photoswipe.openPhotoSwipe(index, $clickedGallery);
+
+        // Prevent default:
+        e.preventDefault ? e.preventDefault() : e.returnValue = false;
+        return false;
       }
-      return false;
+      return true;
     },
     /**
      * Code taken from http://photoswipe.com/documentation/getting-started.html
