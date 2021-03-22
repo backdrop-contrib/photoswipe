@@ -24,25 +24,7 @@
  *
  * @ingroup views_templates
  */
-
-/**
- * Modify template for views that use photoswipe.
- * Check view config settings for image field type 'photoswipe'.
- */
-$view_name = $variables['name'];
-$config_name = 'views.view.' . $view_name;
-$settings = config_get($config_name,'display.default.display_options.fields');
-$field_name = array();
-$view_type = '';
-$div_class = 'view-content';
-if($settings['style_plugin'] == 'default') {
-  foreach($settings['fields'] as $field_name ) {
-    if(array_key_exists('type', $field_name)) {$image_type = $field_name['type'];}
-    if($image_type == 'photoswipe'){$div_class = 'view-content photoswipe-gallery'; }
-  }
-}
 ?>
-
 <div class="<?php print implode(' ', $classes); ?>">
   <?php print render($title_prefix); ?>
   <?php if ($title): ?>
@@ -68,7 +50,7 @@ if($settings['style_plugin'] == 'default') {
   <?php endif; ?>
 
   <?php if ($rows): ?>
-    <div class=" <?php print $div_class; ?> ">
+    <div class="view-content photoswipe-gallery">
       <?php print (is_array($rows)) ? backdrop_render($rows) : $rows; ?>
     </div>
   <?php elseif ($empty): ?>
