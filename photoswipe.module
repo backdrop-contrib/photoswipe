@@ -393,7 +393,7 @@ function photoswipe_preprocess_views_view(&$variables) {
   // Get handlers for fields used in this view.
   $fields = $view->display_handler->get_handlers('field');
 
-  foreach ($fields as $field_name => $field) {
+  foreach ($fields as $field) {
     // Ignore excluded fields.
     if (!empty($field->options['exclude']))
       continue;
