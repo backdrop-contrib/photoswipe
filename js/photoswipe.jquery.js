@@ -1,7 +1,7 @@
 (function ($, Backdrop, PhotoSwipe, PhotoSwipeUI_Default) {
   Backdrop.behaviors.photoswipe = {
     /**
-     * PhotoSwipe Options, coming from Drupal.settings.
+     * PhotoSwipe Options, coming from config settings.
      */
     photoSwipeOptions: {},
     /**
@@ -52,7 +52,6 @@
      */
     onThumbnailsClick: function (e) {
       e = e || window.event;
-      e.preventDefault ? e.preventDefault() : e.returnValue = false;
 
       var $clickedGallery = $(this);
 
@@ -63,16 +62,20 @@
       var clickedListItem = $eTarget.closest('.photoswipe');
 
       if (!clickedListItem) {
-        return;
+        return true;
       }
 
       // get the index of the clicked element
       index = clickedListItem.index('.photoswipe');
       if (index >= 0) {
-        // open PhotoSwipe if valid index found
+        // Open PhotoSwipe if a valid index was found.
         Backdrop.behaviors.photoswipe.openPhotoSwipe(index, $clickedGallery);
+
+        // Prevent default:
+        e.preventDefault ? e.preventDefault() : e.returnValue = false;
+        return false;
       }
-      return false;
+      return true;
     },
     /**
      * Code taken from http://photoswipe.com/documentation/getting-started.html
@@ -108,6 +111,10 @@
         var tn = galleryElement.find('a.photoswipe:eq(' + index + ') img');
         if (tn.length == 0) {
           tn = galleryElement.find('a.photoswipe:eq(0) img');
+        }
+        if (tn.length == 0) {
+          // Return undefined if still null, see https://www.drupal.org/project/photoswipe/issues/3023442
+          return undefined;
         }
         var tw = tn.width();
         var tpos = tn.offset();
