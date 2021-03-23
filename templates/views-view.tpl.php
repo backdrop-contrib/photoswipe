@@ -33,11 +33,9 @@ $view_name = $variables['name'];
 $config_name = 'views.view.' . $view_name;
 $settings = config_get($config_name,'display.default.display_options');
 $div_class = 'view-content';
-if(!isset($settings['style_plugin']) OR ($settings['style_plugin'] == 'default')) {
-  foreach($settings['fields'] as $field_name ) {
-    if(isset($field_name['type'])){$image_type = $field_name['type'];}
-    if($image_type == 'photoswipe'){$div_class = 'view-content photoswipe-gallery'; }
-  }
+foreach($settings['fields'] as $field_name ) {
+  if(isset($field_name['type'])){$image_type = $field_name['type'];}
+  if($image_type == 'photoswipe'){$div_class = 'view-content photoswipe-gallery'; }
 }
 ?>
 
