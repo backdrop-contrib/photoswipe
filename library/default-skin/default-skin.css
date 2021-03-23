@@ -481,8 +481,4 @@ a.pswp__share--download:hover {
 .pswp--minimal--dark .pswp__top-bar {
   background: none; }
 
-/* style added to arrange gallery as one or more rows */
-.photoswipe-gallery div {
-  float: left;
-  margin-right: 5px;
-}
+
