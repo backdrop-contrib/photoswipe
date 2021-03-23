@@ -27,16 +27,11 @@
 
 /**
  * Modify template for views that use photoswipe.
- * Check view config settings for image field type 'photoswipe'.
+ * The $div_class is either a default "view-content" class name
+ * for the view container or it has an additional "photoswipe-gallery"
+ * class if photoswipe module is used in the view. This is evaluated
+ * in photoswipe_preprocess_views_view().
  */
-$view_name = $variables['name'];
-$config_name = 'views.view.' . $view_name;
-$settings = config_get($config_name,'display.default.display_options');
-$div_class = 'view-content';
-foreach($settings['fields'] as $field_name ) {
-  if(isset($field_name['type'])){$image_type = $field_name['type'];}
-  if($image_type == 'photoswipe'){$div_class = 'view-content photoswipe-gallery'; }
-}
 ?>
 
 <div class="<?php print implode(' ', $classes); ?>">
