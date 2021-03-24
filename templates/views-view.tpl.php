@@ -24,7 +24,16 @@
  *
  * @ingroup views_templates
  */
+
+/**
+ * Modify template for views that use photoswipe.
+ * The $div_class is either a default "view-content" class name
+ * for the view container or it has an additional "photoswipe-gallery"
+ * class if photoswipe module is used in the view. This is evaluated
+ * in photoswipe_preprocess_views_view().
+ */
 ?>
+
 <div class="<?php print implode(' ', $classes); ?>">
   <?php print render($title_prefix); ?>
   <?php if ($title): ?>
@@ -50,7 +59,7 @@
   <?php endif; ?>
 
   <?php if ($rows): ?>
-    <div class="view-content photoswipe-gallery">
+    <div class=" <?php print $div_class; ?> ">
       <?php print (is_array($rows)) ? backdrop_render($rows) : $rows; ?>
     </div>
   <?php elseif ($empty): ?>

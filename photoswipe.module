@@ -381,3 +381,29 @@ function photoswipe_theme_registry_alter(&$theme_registry) {
   }
 }
 
+/**
+ * Implements template_preprocess_views_view().
+ * Checks if photoswipe is being used in a view.
+ */
+function photoswipe_preprocess_views_view(&$variables) {
+  // Set view container's default class name.
+  $variables['div_class'] = 'view-content';
+
+  $view = $variables['view'];
+  // Get handlers for fields used in this view.
+  $fields = $view->display_handler->get_handlers('field');
+
+  foreach ($fields as $field) {
+    // Ignore excluded fields.
+    if (!empty($field->options['exclude']))
+      continue;
+    // Check if the field has option type 'photoswipe'.
+    if (isset($field->options['type'])) {
+      // If at least one field uses photoswipe then add photoswipe gallery class to the view.
+      if ($field->options['type'] == 'photoswipe') {  
+        $variables['div_class'] = 'view-content photoswipe-gallery';
+        break;
+      }
+    }
+  }
+}
