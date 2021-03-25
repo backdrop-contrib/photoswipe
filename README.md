@@ -22,7 +22,9 @@ https://backdropcms.org/guide/modules.
 Within 'Manage Displays' for a content type that includes images, 
 select 'Photoswipe' for the format of an image field. Then choose 
 the settings for the node images and the photoswipe images. 
-Multiple images will then be displayed as a gallery.
+Multiple images will then be displayed as a gallery. An additional
+setting is provided to inhibit the gallery action but allowing the
+'lightbox' type of display as for single images.
 
 ### Single image in node
 Photoswipe can be used similarly for fields for single images within 
@@ -33,6 +35,8 @@ of display of the image but not, of course, a gallery.
 Choose the option 'Photoswipe' as the 'Formatter' for the image field.
 Choose a predefined style for your node images (i.e. the thumbnails)
 and a larger style (or the original image) for your Photoswipe image.
+If the 'lightbox' type display is required but not the gallery action
+check the 'Inhibit gallery action' setting.
 
 ### Image captions
 Photoswipe includes an option to use the alt or title values of an 
@@ -54,7 +58,8 @@ Graham Oliver (github.com/Graham-72/)
 
 ## Credits        
 ### Porting to Backdrop
-Graham Oliver with the assistance of the Coder Upgrade module.
+Graham Oliver with the assistance of the Coder Upgrade module
+and Pavel Goloviy (@korontari).
 
 ### Maintainers for Drupal module:
 - Julian Pustkuchen (Anybody)
