@@ -95,6 +95,7 @@ function photoswipe_field_formatter_info() {
         'photoswipe_image_style' => '',
         'photoswipe_caption' => '',
         'photoswipe_view_mode' => '',
+        'photoswipe_gallery_mode' => TRUE
       ),
     ),
   );
@@ -180,6 +181,12 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
     '#type' => 'hidden',
     '#value' => $view_mode,
   );
+  $element['photoswipe_gallery_mode'] = array(
+    '#title' => t('Gallery display'),
+    '#type' => 'checkbox',
+    '#default_value' => isset($settings['photoswipe_gallery_mode']) ? $settings['photoswipe_gallery_mode'] : TRUE,
+    '#description' => t('Display images as a Photoswipe Gallery.'),
+  );
 
   return $element;
 }
@@ -224,7 +231,7 @@ function photoswipe_field_formatter_settings_summary($field, $instance, $view_mo
     $summary[] = t('Photoswipe image style: @style', array('@style' => $image_styles[$settings['photoswipe_image_style']]));
   }
   else {
-    $summary[] = t('photoswipe image style: Original image');
+    $summary[] = t('Photoswipe image style: Original image');
   }
 
   if (isset($settings['photoswipe_caption'])) {
@@ -244,6 +251,13 @@ function photoswipe_field_formatter_settings_summary($field, $instance, $view_mo
   else {
     $summary[] = t('Photoswipe Caption: Image Alt Tag');
   }
+  if (isset($settings['photoswipe_gallery_mode'])
+    && ($settings['photoswipe_gallery_mode'] == FALSE )) {
+    $summary[] = t('Gallery: No');
+  }
+  else {
+    $summary[] = t('Gallery: Yes');
+  }
 
   return implode('<br />', $summary);
 }
@@ -256,9 +270,15 @@ function photoswipe_field_formatter_view($entity_type, $entity, $field, $instanc
 
   if (!empty($items)) {
     photoswipe_load_assets();
+    // set container class to show a gallery.
+    $container_class = 'photoswipe-gallery';
+    // except if 'photoswipe_gallery_mode' does not exist or is FALSE.
+    if (isset($instance['display']['default']['settings']['photoswipe_gallery_mode'])
+      && ($instance['display']['default']['settings']['photoswipe_gallery_mode'] == FALSE))
+      { $container_class = 'display-as-single'; }
     $element = array(
       '#type' => 'container',
-      '#attributes' => array('class' => array('photoswipe-gallery')),
+      '#attributes' => array('class' => array($container_class)),
     );
   }
 
@@ -399,11 +419,18 @@ function photoswipe_preprocess_views_view(&$variables) {
       continue;
     // Check if the field has option type 'photoswipe'.
     if (isset($field->options['type'])) {
-      // If at least one field uses photoswipe then add photoswipe gallery class to the view.
-      if ($field->options['type'] == 'photoswipe') {  
+      // If a field uses photoswipe then add photoswipe gallery class to the view.
+      if ($field->options['type'] == 'photoswipe') {
         $variables['div_class'] = 'view-content photoswipe-gallery';
-        break;
+        // except if 'photoswipe_gallery_mode' exists and is FALSE.
+        if (isset($field->options['settings']['photoswipe_gallery_mode'])
+          && $field->options['settings']['photoswipe_gallery_mode'] == FALSE) {
+            $variables['div_class'] = 'view-content';
+          }
+        }
       }
     }
   }
-}
+
+
+
