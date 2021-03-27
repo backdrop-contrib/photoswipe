@@ -196,8 +196,12 @@ function photoswipe_field_formatter_settings_form($field, $instance, $view_mode,
  */
 function is_text_field($field_name) {
   $field_info = field_info_field($field_name);
-  $text_types = array('text','text_long','text_with_summary');
-  return in_array($field_info['type'], $text_types);
+  $text_check = '';
+  if (isset($field_info['type'])) {
+    $text_types = array('text', 'text_long', 'text_with_summary');
+    $text_check = in_array($field_info['type'], $text_types);
+  }
+  return $text_check;
 }
 
 /**
