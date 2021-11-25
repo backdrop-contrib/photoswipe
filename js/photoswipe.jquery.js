@@ -124,7 +124,7 @@
 
       // Define options.
       // Define gallery index (for URL).
-      options.index = Number(index);
+      options.index = index;
       // Define gallery unique id.
       options.galleryUID = parseInt(galleryElement.data('pswp-uid'), 10);
       // Use slides pids instead of calculated index.
@@ -134,10 +134,9 @@
 
       // Add zoom animation function.
       options.getThumbBoundsFn = function (index) {
-        var pid = items[index].pid;
-        var tn = galleryElement.find('.photoswipe[data-pid="' + pid + '"] img');
+        var tn = galleryElement.find('a.photoswipe[data-pid="' + index + '"] img');
         if (tn.length == 0) {
-          tn = galleryElement.find('.photoswipe:eq(0) img');
+          tn = galleryElement.find('a.photoswipe:eq(0) img');
         }
         if (tn.length == 0) {
           // Return undefined if still null, see https://www.drupal.org/project/photoswipe/issues/3023442
