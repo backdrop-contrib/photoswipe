@@ -77,7 +77,7 @@ function photoswipe_preprocess_page(&$variables) {
     photoswipe_load_assets();
   }
   if (photoswipe_assets_loaded()) {
-    $variables['page_bottom'] = theme ('photoswipe_container', $variables);
+    $variables['page_bottom'] .= theme ('photoswipe_container', $variables);
   }
 }
 
